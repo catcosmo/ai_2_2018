@@ -70,14 +70,27 @@ public class Bot {
         float newYPosf;
         int newXPos;
         int newYPos;
-
+        float tempCarryX = 0.0f; //Uebertrag von Runden
+        float tempCarryY = 0.0f;
         // check all fields on the way until you reach destination (=PU)
         while (temp._isWalkable && temp._x!=nearestPU._x && temp._y != nearestPU._y){
             // calc next Field
-            newXPosf = temp._x + move_x;
+            newXPosf = temp._x + move_x + tempCarryX;
+            if( tempCarryX!=0.0f ) {
+                tempCarryX=0.0f;
+            }
             newXPos = Math.round(newXPosf);
-            newYPosf = temp._y + move_y;
+            if (newXPos == temp._x){
+                tempCarryX = move_x;
+            }
+            newYPosf = temp._y + move_y + tempCarryY;
+            if( tempCarryY!=0.0f ) {
+                tempCarryY=0.0f;
+            }
             newYPos = Math.round(newYPosf);
+            if (newYPos == temp._y){
+                tempCarryY = move_y;
+            }
             //check if field is walkable
             next = board._board[newXPos][newYPos];
             if(next._isWalkable){
