@@ -38,6 +38,8 @@ public class Client {
         Board board = new Board(this);
         board.initBoard();
 
+        PowerUps powerUps = new PowerUps();
+
         Bot bot0 = new Bot(0,1,0); // bot 0 nach rechts
         Bot bot1 = new Bot(1,1,0); // bot 1 nach rechts unten
         Bot bot2 = new Bot(2,0,1); // bot 1 nach rechts unten
@@ -47,6 +49,7 @@ public class Client {
             while ((update = client.pullNextUpdate()) != null) {
 
                 board.updateBoard(update);
+                powerUps.update(update);
                 bot0.updatePos(update, board, this);
                 bot1.updatePos(update, board, this);
                 bot2.updatePos(update, board, this);
