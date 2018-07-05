@@ -42,7 +42,7 @@ public class Board {
             // place player
             _board[update.x][update.y]._player = update.player;
             _board[update.x][update.y]._bot = update.bot;
-        } else if (update.player > -1 && update.bot == 0){
+        } else if (update.player > -1 && update.bot == -1){
             // delete PowerUp and update player position
             _board[update.x][update.y]._player = update.player;
             _board[update.x][update.y]._puType = null;

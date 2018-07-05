@@ -54,9 +54,9 @@ public class Client {
                 bot1.updatePos(update, board, this);
                 bot2.updatePos(update, board, this);
 
-                bot0.move(board, this);
-                bot1.move(board, this);
-                bot2.move(board, this);
+                bot0.move(board, this, powerUps);
+                bot1.move(board, this, powerUps);
+                bot2.move(board, this, powerUps);
 
             }
             try {

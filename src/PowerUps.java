@@ -4,6 +4,8 @@ import lenz.htw.zpifub.Update;
 import java.util.HashSet;
 import java.util.Iterator;
 
+import static lenz.htw.zpifub.PowerupType.SLOW;
+
 public class PowerUps {
     private HashSet<PowerUp> _powerups = new HashSet<PowerUp>(3);
 
@@ -17,10 +19,12 @@ public class PowerUps {
             _powerups.add(p);
         }
         else
-        if (update.player > -1 && update.bot == 0){
+        if (update.player > -1 && update.bot > -1){
             // delete PowerUp
             PowerUp p = get(update.x, update.y);
-            _powerups.remove(p);
+            if( p!=null ) {
+                _powerups.remove(p);
+            }
         }
     }
 
@@ -31,7 +35,7 @@ public class PowerUps {
         for (Iterator<PowerUp> iterator = _powerups.iterator(); iterator.hasNext(); ) {
             PowerUp next = iterator.next();
             int diff = (x-next._x)+(y-next._y);
-            if (diff < best_diff) {
+            if (diff < best_diff && next._type != SLOW) {
                 best = next;
             }
         }
