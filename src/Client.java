@@ -18,6 +18,10 @@ public class Client {
         return thread;
     }
 
+    public NetworkClient getRemoteClient() {
+        return client;
+    }
+
     private void moveClient(){
         client = new NetworkClient("localhost", "wholetrain", "If it takes more than 5 minutes, its not graffiti.");
 
@@ -28,7 +32,7 @@ public class Client {
         // client.getInfluenceRadiusForBot(0); // gibt 40
 
 
-        // client.isWalkable(x, y); // begehbar oder Hinderniss?
+        // client._isWalkable(x, y); // begehbar oder Hinderniss?
 
         //int rgb = client.getBoard(x, y); // x,y zwischen 0-1023
         //int b = rgb & 255;
