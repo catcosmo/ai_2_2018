@@ -39,20 +39,22 @@ public class Client {
         board.initBoard();
 
         Bot bot0 = new Bot(0,1,0); // bot 0 nach rechts
-        Bot bot1 = new Bot(1,0.23f,-0.52f); // bot 1 nach rechts unten
-        Bot bot2 = new Bot(2,0.23f,-0.52f); // bot 1 nach rechts unten
+        Bot bot1 = new Bot(1,1,0); // bot 1 nach rechts unten
+        Bot bot2 = new Bot(2,0,1); // bot 1 nach rechts unten
 
         while( client.isAlive() ) {
             Update update;
             while ((update = client.pullNextUpdate()) != null) {
-                if (update.type == null) {
-                    //bot[update.player][update.bot].pos = update.x, update.y;
-                    bot0.move(board, this);
-                    bot1.move(board, this);
-                    bot2.move(board, this);
-                } else {
-                    board.updateBoard(update);
-                }
+
+                board.updateBoard(update);
+                bot0.updatePos(update, board, this);
+                bot1.updatePos(update, board, this);
+                bot2.updatePos(update, board, this);
+
+                bot0.move(board, this);
+                bot1.move(board, this);
+                bot2.move(board, this);
+
             }
             try {
                 Thread.sleep(100);
