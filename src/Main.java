@@ -9,8 +9,8 @@ public class Main {
         Client client3 = new Client();
 
         Thread thread1 = client1.startPlayLoop();
-        Thread thread2 = client1.startPlayLoop();
-        Thread thread3 = client1.startPlayLoop();
+        Thread thread2 = client2.startPlayLoop();
+        Thread thread3 = client3.startPlayLoop();
 
         try {
             thread1.join();
