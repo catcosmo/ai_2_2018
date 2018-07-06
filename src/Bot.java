@@ -26,7 +26,8 @@ public class Bot {
             _pos = board.getBotPos(_botNr);
         }
 
-        if( !moveToNearestPU(powerUps, board) && collDetect(board) ) {
+        if( !moveToNearestPU(powerUps, board) &&
+             collDetect(board) ) {
             _move_x = _move_x*-1;
             _move_y = _move_y*-1;
         }
