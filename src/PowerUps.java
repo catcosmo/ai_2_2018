@@ -28,7 +28,6 @@ public class PowerUps {
         }
     }
 
-    // TODO calc nearest power up
     public PowerUp findNearest(int x, int y) {
         PowerUp best = null;
         int best_diff = 9999999;
