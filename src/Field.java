@@ -9,6 +9,7 @@ public class Field implements Cloneable {
     public int _bot = -1;
     public PowerupType _puType = null;
     public boolean _hasPU = false;
+    public boolean _tempBlock = false;
 
 
     public Field() {

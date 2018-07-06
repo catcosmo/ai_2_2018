@@ -71,6 +71,7 @@ public class Client {
 
         Board board = new Board(this);
         board.initBoard();
+        board.getRaster(128);
 
         PowerUps powerUps = new PowerUps();
 
