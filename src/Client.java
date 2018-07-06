@@ -90,12 +90,13 @@ public class Client {
                 bot0.updatePos(update, board, this);
                 bot1.updatePos(update, board, this);
                 bot2.updatePos(update, board, this);
-
-                bot0.move(board, this, powerUps);
-                bot1.move(board, this, powerUps);
-                bot2.move(board, this, powerUps);
-
             }
+
+            // move AFTER all updates are processed
+            bot0.move(board, this, powerUps);
+            bot1.move(board, this, powerUps);
+            bot2.move(board, this, powerUps);
+
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
