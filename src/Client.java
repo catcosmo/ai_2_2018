@@ -20,6 +20,23 @@ public class Client {
         return thread;
     }
 
+    public Thread startSaveLoop(final Board board) {
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while( client.isAlive() ) {
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                    }
+                    //board.saveBoard();
+                }
+            }
+        });
+        thread.start();
+        return thread;
+    }
+
     public NetworkClient getRemoteClient() {
         return client;
     }
@@ -61,6 +78,8 @@ public class Client {
         Bot bot1 = new Bot(1, 1, 0); // bot 1 nach rechts unten
         Bot bot2 = new Bot(2, 0, 1); // bot 1 nach rechts unten
 
+        Thread saveLoop = startSaveLoop(board);
+
         while( client.isAlive() ) {
             Update update;
             while ((update = client.pullNextUpdate()) != null) {
@@ -80,6 +99,11 @@ public class Client {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
             }
+        }
+
+        try {
+            saveLoop.join();
+        } catch (InterruptedException e) {
         }
     }
 }

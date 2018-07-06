@@ -2,10 +2,11 @@ import lenz.htw.zpifub.Update;
 
 import static lenz.htw.zpifub.PowerupType.RAIN;
 
-public class Board {
+public class Board implements Cloneable {
     Field[][] _board = new Field[1024][1024];
     Client _client = null;
-    DrawPanel _draw = new DrawPanel(this);
+    DrawPanel _draw = new DrawPanel();
+    int _updateNo = 0;
 
     public Board(Client client) {
         _client=client;
@@ -23,7 +24,7 @@ public class Board {
                 _board[x][y] = field;
             }
         }
-        //_draw.save("pl_" + _client.getRemoteClient().getMyPlayerNumber() + "_init.png");
+        _draw.save(this,"pl_" + _client.getRemoteClient().getMyPlayerNumber() + "_init.png");
     }
 
     public void updateBoard(Update update){
@@ -31,6 +32,7 @@ public class Board {
         if(update.player == -1 && update.bot == -1){
             _board[update.x][update.y]._puType = update.type;
             _board[update.x][update.y]._hasPU = true;
+            saveBoard("PU");
             // if PU is NOT RAIN (so should be avoided)
 //            // make 20px non walkable barrier around it so that the bots don't hit it
 //            if(_board[update.x][update.y]._puType!=RAIN){
@@ -44,7 +46,6 @@ public class Board {
             // place player
             _board[update.x][update.y]._player = update.player;
             _board[update.x][update.y]._bot = update.bot;
-            //_draw.save("pl_" + _client.getRemoteClient().getMyPlayerNumber() + "_bot_"+ update.bot + ".png");
         } else if (update.player > -1 && update.bot == -1){
             // delete PowerUp and update player position
             _board[update.x][update.y]._player = update.player;
@@ -59,6 +60,7 @@ public class Board {
 //                }
 //            }
         }
+        _updateNo += 1;
     }
 
     public Field getBotPos(int botNr) {
@@ -73,5 +75,26 @@ public class Board {
 
     public Field getField(int x, int y) {
         return _board[x][y];
+    }
+
+    public void saveBoard() {
+        //if( _updateNo%10==0  ) {
+            _draw.save(this,"u_" + _updateNo + ".png");
+        //}
+    }
+
+    private void saveBoard(String fn) {
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                _draw.save(Board.this,"u_" + _updateNo + "_" + fn + ".png");
+            }
+        });
+        thread.start();
+    }
+
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        return super.clone();
     }
 }

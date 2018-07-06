@@ -1,6 +1,6 @@
 import lenz.htw.zpifub.PowerupType;
 
-public class Field {
+public class Field implements Cloneable {
     public int _x;
     public int _y;
     public int _color;
@@ -12,6 +12,11 @@ public class Field {
 
 
     public Field() {
+    }
+
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        return super.clone();
     }
 
 

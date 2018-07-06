@@ -1,36 +1,42 @@
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
 public class DrawPanel extends JPanel {
-    private static final int SCALE = 5;
-    Board _board;
+    private static final int SCALE = 1;
+    private Board _board;
 
-    public DrawPanel(Board board)
+    public DrawPanel()
     {
-        _board = board;
         setOpaque(false);
         setBackground(Color.WHITE);
-        setSize(1024*SCALE, 1024*SCALE);
+        setSize(1024, 1024);
+    }
+
+    public void setBoard(Board board) {
+        _board = board;
     }
 
     @Override
     public void paintComponent(Graphics g)
     {
         super.paintComponent(g);
+        Graphics2D ga = (Graphics2D)g;
 
-        for(int x=0; x<1024; ++x) {
-            for( int y=0; y<1024; ++y ) {
-                Color color = Color.WHITE;
-                if( !_board._board[x][y]._isWalkable ) {
-                    color = Color.BLACK;
-                }
-                else
+        for(int x=0; x<1024; x += SCALE ) {
+            for( int y=0; y<1024; y += SCALE ) {
+                int pen = SCALE;
+                ga.setColor(Color.WHITE);
+                ga.fillRect(x-pen/2, y-pen/2, pen, pen);
+
                 if( _board._board[x][y]._player!=-1 )    {
                     int player = _board._board[x][y]._player;
+                    pen = 10;
+                    Color color = Color.WHITE;
                     switch (player) {
                         case 0:
                             color=Color.RED;
@@ -40,20 +46,40 @@ public class DrawPanel extends JPanel {
                             break;
                         case 2:
                             color=Color.BLUE;
-                        break;
+                            break;
                     }
+                    ga.setColor(color);
+                    //Ellipse2D.Double circle = new Ellipse2D.Double(x, y, pen, pen);
+                    //ga.fill(circle);
+                    ga.fillRect(x-pen/2, y-pen/2, pen, pen);
                 }
-                g.setColor(color);
-                g.drawRect(x*SCALE, y*SCALE, x*SCALE+SCALE, y*SCALE+SCALE);
+                //else
+                if( _board._board[x][y]._hasPU ) {
+                    pen = 20;
+                    ga.setColor(Color.ORANGE);
+                    //Ellipse2D.Double circle = new Ellipse2D.Double(x, y, pen, pen);
+                    //ga.fill(circle);
+                    ga.fillRect(x-pen/2, y-pen/2, pen, pen);
+                }
+                else
+                if( !_board._board[x][y]._isWalkable ) {
+                    ga.setColor(Color.BLACK);
+                    ga.fillRect(x-pen/2, y-pen/2, pen, pen);
+                }
+//                else {
+//                    ga.setColor(Color.WHITE);
+//                    ga.fillRect(x-pen/2, y-pen/2, pen, pen);
+//                }
             }
         }
 
     }
 
-    public void save(String filename)
+    public void save(Board board, String filename)
     {
         BufferedImage bImg = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_RGB);
         Graphics2D cg = bImg.createGraphics();
+        setBoard(board);
         paintComponent(cg);
         try {
             if (ImageIO.write(bImg, "png", new File(filename)))
