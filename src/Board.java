@@ -20,6 +20,9 @@ public class Board implements Cloneable {
                 field._puType = null;
                 field._color = _client.getRemoteClient().getBoard(x,y);
                 field._isWalkable = _client.getRemoteClient().isWalkable(x,y);
+                if( !field._isWalkable ) {
+                    field._color=Field.BLACK;
+                }
                 field._x = x;
                 field._y = y;
                 _board[x][y] = field;
@@ -40,8 +43,7 @@ public class Board implements Cloneable {
                 for (int x = update.x-20; x <= update.x+20 ; x++) {
                     for (int y = update.y-20; y <= update.y+20; y++) {
                         _board[x][y]._tempBlock = true;
-                        System.out.println("TenpBlockAdd x:"+x+"y:"+y);
-
+                        // System.out.println("TenpBlockAdd x:"+x+"y:"+y);
                     }
                 }
             }
@@ -49,14 +51,16 @@ public class Board implements Cloneable {
             // place player
             _board[update.x][update.y]._player = update.player;
             _board[update.x][update.y]._bot = update.bot;
+            _board[update.x][update.y].setColorFromPlayer(update.player);
         } else if (update.player > -1 && update.bot == -1){
             // delete PowerUp and update player position
             _board[update.x][update.y]._player = update.player;
+            _board[update.x][update.y].setColorFromPlayer(update.player);
             _board[update.x][update.y]._puType = null;
             _board[update.x][update.y]._hasPU = false;
             // clean up CLOCK barrier
             if(_board[update.x][update.y]._tempBlock){
-                System.out.println("TenpBlockRemove x:"+update.x+"y:"+update.y);
+                // System.out.println("TenpBlockRemove x:"+update.x+"y:"+update.y);
 
                 for (int x = update.x-20; x <= update.x+20 ; x++) {
                     for (int y = update.y - 20; y <= update.y + 20; y++) {
@@ -90,7 +94,7 @@ public class Board implements Cloneable {
         for (int y = 0; y < 1024; y+=rasterSize) {
             for (int x = 0; x < 1024; x+=rasterSize) {
                 int weight = calcRasterWeight(x, y, rasterSize);
-                System.out.println("Weight for Raster" + counter + "is" + weight);
+                System.out.println("Weight for Raster:" + counter + " is:" + weight);
                 RasterNode rasterNode = new RasterNode(x, y, rasterSize, counter, weight);
                 counter+=1;
             }
@@ -112,10 +116,11 @@ public class Board implements Cloneable {
         int bTemp;
 
         // go through raserNode pixel by pixel
-        for (int y = startY; y < rasterSize; y++) {
-            for(int x = startX; x < rasterSize; x++) {
+        for (int y = startY; y < startY + rasterSize; y++) {
+            for(int x = startX; x < startX + rasterSize; x++) {
                 //extract color as int 0-255
-                rgb = _client.getRemoteClient().getBoard(x, y);
+                //rgb = getField(x,y)._color;
+                rgb = _client.getRemoteClient().getBoard(x,y);
                 bTemp = rgb & 255;
                 gTemp = (rgb >> 8) & 255;
                 rTemp = (rgb >> 16) & 255;
