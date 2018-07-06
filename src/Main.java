@@ -5,8 +5,8 @@ public class Main {
         //String hostName = "localhost";
 
         Client client1 = new Client();
-        Client client2 = new Client();
-        Client client3 = new Client();
+        Client client2 = new Client(true);
+        Client client3 = new Client(true);
 
         Thread thread1 = client1.startPlayLoop();
         Thread thread2 = client2.startPlayLoop();
