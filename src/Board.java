@@ -5,6 +5,7 @@ import static lenz.htw.zpifub.PowerupType.RAIN;
 public class Board {
     Field[][] _board = new Field[1024][1024];
     Client _client = null;
+    DrawPanel _draw = new DrawPanel(this);
 
     public Board(Client client) {
         _client=client;
@@ -22,6 +23,7 @@ public class Board {
                 _board[x][y] = field;
             }
         }
+        //_draw.save("pl_" + _client.getRemoteClient().getMyPlayerNumber() + "_init.png");
     }
 
     public void updateBoard(Update update){
@@ -42,6 +44,7 @@ public class Board {
             // place player
             _board[update.x][update.y]._player = update.player;
             _board[update.x][update.y]._bot = update.bot;
+            //_draw.save("pl_" + _client.getRemoteClient().getMyPlayerNumber() + "_bot_"+ update.bot + ".png");
         } else if (update.player > -1 && update.bot == -1){
             // delete PowerUp and update player position
             _board[update.x][update.y]._player = update.player;
