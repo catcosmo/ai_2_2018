@@ -87,6 +87,22 @@ public class Board implements Cloneable {
     }
 
 
+    //calculate hot area for bot
+    public RasterNode getHotArea(RasterNode[] rasterNodes, Bot bot){
+        int botRadius = _client.getRemoteClient().getInfluenceRadiusForBot(bot._botNr);
+        int best = 0;
+        int hottestArea = 1;
+        for (int i = 0; i < rasterNodes.length; i++) {
+            if(rasterNodes[i].get_weight()>best) {
+                best = rasterNodes[i].get_weight();
+                hottestArea = i;
+
+            }
+        }
+        return rasterNodes[hottestArea];
+    }
+
+
     // calculate rasterNodes and store in List
     public RasterNode[] getRaster(int rasterSize) {
         int counter = 0;
@@ -154,8 +170,6 @@ public class Board implements Cloneable {
                             g += gTemp;
                             break;
                     }
-
-                    r += (rgb >> 16) & 255;
                 }
                 //TODO finish method & logic
             }
