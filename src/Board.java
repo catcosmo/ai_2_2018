@@ -36,7 +36,7 @@ public class Board implements Cloneable {
         if(update.player == -1 && update.bot == -1){
             _board[update.x][update.y]._puType = update.type;
             _board[update.x][update.y]._hasPU = true;
-            saveBoard("PU");
+            //saveBoard("PU");
             // if PU is CLOCK (so should be avoided)
 //            // make 20px non walkable barrier around it so that the bots don't hit it
             if(_board[update.x][update.y]._puType==SLOW){
