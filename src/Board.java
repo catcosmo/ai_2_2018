@@ -27,7 +27,7 @@ public class Board implements Cloneable {
                 _board[x][y] = field;
             }
         }
-        _draw.save(this,"pl_" + _client.getRemoteClient().getMyPlayerNumber() + "_init.png");
+        //_draw.save(this,"pl_" + _client.getRemoteClient().getMyPlayerNumber() + "_init.png");
     }
 
     public void updateBoard(Update update){
