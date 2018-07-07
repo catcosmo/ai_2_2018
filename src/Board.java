@@ -92,13 +92,39 @@ public class Board implements Cloneable {
         int botRadius = _client.getRemoteClient().getInfluenceRadiusForBot(bot._botNr);
         int best = 0;
         int hottestArea = 1;
+        int closest = 0;
         for (int i = 0; i < rasterNodes.length; i++) {
+            //if brush is slow, check nearer neighbourhood only
+            //spraycan gets the whole field to play in
+            //small brush
+            // TODO fixnullpointer exception
+            if(botRadius == 15 &&
+                    ((bot._pos._x-rasterNodes[i].get_startX())>512
+                        || (bot._pos._y-rasterNodes[i].get_startY())>512)){
+                continue;
+            }
+            //wide brush
+            if(botRadius == 30 &&
+                    ((bot._pos._x-rasterNodes[i].get_startX())>400
+                            || (bot._pos._y-rasterNodes[i].get_startY())>400)){
+                continue;
+            }
             if(rasterNodes[i].get_weight()>best) {
                 best = rasterNodes[i].get_weight();
+                closest = (bot._pos._x-rasterNodes[i].get_startX())+(bot._pos._y-rasterNodes[i].get_startY());
                 hottestArea = i;
 
             }
+            //get NEAREST hottest field: if rasterNode is equally good, take the closer one
+            else if (rasterNodes[i].get_weight()==best){
+                if(closest > (bot._pos._x-rasterNodes[i].get_startX())+(bot._pos._y-rasterNodes[i].get_startY())){
+                    best = rasterNodes[i].get_weight();
+                    closest = (bot._pos._x-rasterNodes[i].get_startX())+(bot._pos._y-rasterNodes[i].get_startY());
+                    hottestArea = i;
+                }
+            }
         }
+        System.out.println("Hottest Area for this bot is" + rasterNodes[hottestArea].get_numberID());
         return rasterNodes[hottestArea];
     }
 
@@ -112,6 +138,7 @@ public class Board implements Cloneable {
                 int weight = calcRasterWeight(x, y, rasterSize);
                 System.out.println("Weight for Raster:" + counter + " is:" + weight);
                 RasterNode rasterNode = new RasterNode(x, y, rasterSize, counter, weight);
+                rasterNodes[counter] = rasterNode;
                 counter+=1;
             }
         }
