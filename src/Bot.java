@@ -20,6 +20,10 @@ public class Bot {
         _move_y = move_y;
     }
 
+    private void log(String msg) {
+        System.out.println("Bot["+_botNr+"@"+_pos._x+","+_pos._y+"|"+_move_x+","+_move_y+"]"+msg);
+    }
+
     public void updatePos(Update update, Board board, Client client) {
         if( update.type==null ) {
             if( update.player==client.getRemoteClient().getMyPlayerNumber() &&
@@ -125,7 +129,15 @@ public class Bot {
         for( int i=0; i<steps; ++i) {
             nextField=calcNextField(board,i);
             if( !nextField._isWalkable || nextField._tempBlock ) {
-                System.out.println("Bot["+_botNr+"@"+_pos._x+","+_pos._y+"|"+_move_x+","+_move_y+"]::collDetect() @"+nextField._x+","+nextField._y);
+                log("::collDetect() @"+nextField.toString());
+                // LOG SURROUNDING FIELDS of collision
+//                for(int fooX=-1; fooX<2; ++fooX) {
+//                    for( int fooY=-1; fooY<2; ++fooY) {
+//                        int nbX = nextField._x + fooX;
+//                        int nbY = nextField._y + fooY;
+//                        log("::collDetect()      NB FIELDS:"+board._board[nbX][nbY].toString());
+//                    }
+//                }
                 return true;
             }
         }
@@ -133,19 +145,19 @@ public class Bot {
             (_pos._x-steps<0 && _move_x<0) ||
             (_pos._y+steps>1023 && _move_y>0) ||
             (_pos._y-steps<0 && _move_y<0) ) {
-            System.out.println("Bot["+_botNr+"@"+_pos._x+","+_pos._y+"|"+_move_x+","+_move_y+"]::collDetect() -> BORDERFIELD");
+            log("::collDetect() -> BORDERFIELD");
             return true;
         }
 
         return false;
     }
 
-    private Field calcNextField(Board board, int step){
-        float newXPosf = _pos._x + _move_x*step;
+    private Field calcNextField(Board board, float intentedX, float intendedY, int step){
+        float newXPosf = _pos._x + intentedX*step;
         int newXPos = Math.round(newXPosf);
         if(newXPos > 1023) newXPos = 1023;
         if(newXPos < 0) newXPos = 0;
-        float newYPosf = _pos._y + _move_y*step;
+        float newYPosf = _pos._y + intendedY*step;
         int newYPos = Math.round(newYPosf);
         if(newYPos > 1023) newYPos = 1023;
         if(newYPos < 0) newYPos = 0;
@@ -161,33 +173,31 @@ public class Bot {
         float move_y = 0.0f;
         double angle = 45;
 
-        if( collDetect(board) ) {
-            float[] moveVector = calcNewDirVector(angle);
-            move_x = (moveVector[0]) % 1;
-            move_y = (moveVector[1]) % 1;
-//            if( _move_x>0 && move_y>0 ) {
-//                move_x *= -1;
-//            }
-//            if( _move_y>0 && move_y>0 ) {
-//                move_y *= -1;
-//            }
-            System.out.println("Bot["+_botNr+"@"+_pos._x+","+_pos._y+"|"+move_x+","+move_y+"]::paintArea() -> COLL Turn!");
+        if( collDetect(board,_move_x,_move_y) ) {
+            move_x = _move_x;
+            move_y = _move_y;
+            while( collDetect(board,move_x,move_y)) {
+                angle *=-1;
+                float[] moveVector = calcNewDirVector(angle);
+                move_x = (moveVector[0]) % 1;
+                move_y = (moveVector[1]) % 1;
+            }
+            log("::paintArea() -> COLL Turn!");
             startAreaTurnX = _pos._x;
             startAreaTurnY = _pos._y;
         }
         else
         if( (startAreaTurnY != 0.0f || startAreaTurnX != 0.0f ) &&
             abs(startAreaTurnX-_pos._x) +abs(startAreaTurnY-_pos._y)>2*_radius ) {
-            float[] moveVector = calcNewDirVector(angle);
-            move_x = (moveVector[0]) % 1;
-            move_y = (moveVector[1]) % 1;
-//            if( _move_x>0 && move_y>0 ) {
-//                move_x *= -1;
-//            }
-//            if( _move_y>0 && move_y>0 ) {
-//                move_y *= -1;
-//            }
-            System.out.println("Bot["+_botNr+"@"+_pos._x+","+_pos._y+"|"+move_x+","+move_y+"]::paintArea() -> 2x bot._radius drawn - Turn!");
+            move_x = _move_x;
+            move_y = _move_y;
+            while( collDetect(board,move_x,move_y)) {
+                angle *=-1;
+                float[] moveVector = calcNewDirVector(angle);
+                move_x = (moveVector[0]) % 1;
+                move_y = (moveVector[1]) % 1;
+            }
+            log("::paintArea() -> 2x bot._radius drawn - Turn!");
             startAreaTurnX = 0;
             startAreaTurnY = 0;
         }

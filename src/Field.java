@@ -21,6 +21,10 @@ public class Field implements Cloneable {
     public Field() {
     }
 
+    public String toString() {
+        return "Field["+_x+","+_y+"]: w"+_isWalkable+", tb"+_tempBlock;
+    }
+
     public void setColorFromPlayer(int player) {
         switch ( player ) {
             case 0:
