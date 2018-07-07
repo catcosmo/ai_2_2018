@@ -55,7 +55,7 @@ public class DrawPanel extends JPanel {
                 }
                 //else
                 if (_board._board[x][y]._hasPU) {
-                    pen = Bot.RASTER_SIZE_DIJKSTRA;
+                    pen = 20;
                     ga.setColor(Color.ORANGE);
                     //Ellipse2D.Double circle = new Ellipse2D.Double(x, y, pen, pen);
                     //ga.fill(circle);
@@ -79,7 +79,7 @@ public class DrawPanel extends JPanel {
             ga.setColor(Color.MAGENTA);
             for (RasterNode rasterNode : my_way) {
                 if( rasterNode==my_way.get(0) || rasterNode==my_way.get(my_way.size()-1)){
-                    pen=20;
+                    pen=Bot.RASTER_SIZE_DIJKSTRA;
                 } else {
                     pen = 8;
                 }
