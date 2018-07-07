@@ -51,7 +51,8 @@ public class Bot {
             moveToNearestPU(powerUps, board);
             paintArea(board);
 
-            if ( //!moveToNearestPU(powerUps, board) &&
+            if (//!moveToNearestPU(powerUps, board) &&
+                //!moveToHottestArea &&
                 //!paintArea(board) &&
                     collDetect(board, _move_x, _move_y)) {
                 _move_x = _move_x * -1;
@@ -91,8 +92,7 @@ public class Bot {
             move_x = (float) (diffX * (1.0 / dist));
             move_y = (float) (diffY * (1.0 / dist));
 
-            // TODO schnellster bot am PU soll fahren die anderen nicht
-            if (!isPathClear(move_x, move_y, nearestPU, board)) {
+            if (!isPathClear(move_x, move_y, nearestPU._x, nearestPU._y, board)) {
                 return false;
             }
         }
@@ -104,7 +104,38 @@ public class Bot {
         return false;
     }
 
-    private boolean isPathClear(float move_x, float move_y, PowerUp nearestPU, Board board) {
+    public boolean moveToHottestArea(RasterNode[] rasterNodes, Board board) {
+        if( _pos == null )
+            return false;
+        float move_x = 0.0f;
+        float move_y = 0.0f;
+
+        //get hottest area
+        RasterNode rasterNode = board.getHotArea(rasterNodes, this);
+
+        //get x,y coordinates of center = goal
+        int fieldCenterX = rasterNode.get_startX()+rasterNode.get_size()/2;
+        int fieldCenterY = rasterNode.get_startY()+rasterNode.get_size()/2;
+
+        //calculate movement vector to goal
+        int diffX = (_pos._x - fieldCenterX) * -1;
+        int diffY = (_pos._y - fieldCenterY) * -1;
+        float dist = (float) Math.sqrt((diffX * diffX) + (diffY * diffY));
+        move_x = (float) (diffX * (1.0 / dist));
+        move_y = (float) (diffY * (1.0 / dist));
+
+        if (!isPathClear(move_x, move_y, fieldCenterX, fieldCenterY, board)) {
+            return false;
+        }
+        if( move_x!=0.0f || move_y!=0.0f) {
+            _move_x = move_x;
+            _move_y = move_y;
+            return true;
+        }
+        return false;
+    }
+
+    private boolean isPathClear(float move_x, float move_y, int goalX, int goalY, Board board) {
         //starting position
         Field temp = _pos;
         Field next = null;
@@ -114,8 +145,8 @@ public class Bot {
         int newYPos;
         float tempCarryX = 0.0f; //Uebertrag von Runden
         float tempCarryY = 0.0f;
-        // check all fields on the way until you reach destination (=PU)
-        while (temp._isWalkable && temp._x!=nearestPU._x && temp._y != nearestPU._y){
+        // check all fields on the way until you reach destination
+        while (temp._isWalkable && temp._x!=goalX && temp._y != goalY){
             // calc next Field
             newXPosf = temp._x + move_x + tempCarryX;
             if( tempCarryX!=0.0f ) {
