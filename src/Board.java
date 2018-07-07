@@ -181,30 +181,25 @@ public class Board implements Cloneable {
         for (int y = startY; y < startY + rasterSize; y++) {
             for (int x = startX; x < startX + rasterSize; x++) {
 
-                if( !_client.getRemoteClient().isWalkable(x,y) ) {
+                if( !_board[x][y]._isWalkable ) {
                     has_non_walkable=true;
                 } else {
+//                    int rgb = _client.getRemoteClient().getBoard(x, y);
+//                    int bTemp = rgb & 255;
+//                    int gTemp = (rgb >> 8) & 255;
+//                    int rTemp = (rgb >> 16) & 255;
+//                    int plNo = _client.getRemoteClient().getMyPlayerNumber();
+//                    if (rTemp == bTemp && rTemp == 255)
+//                        continue;
+//
+//                    if (plNo == 0 && rTemp >= 125) {
+//                        has_my_color = true;
+//                    } else if (plNo == 1 && gTemp >= 125) {
+//                        has_my_color = true;
+//                    } else if (plNo == 2 && bTemp >= 125) {
+//                        has_my_color = true;
+//                    }
                     weight += 100;
-                }
-
-                int rgb = _client.getRemoteClient().getBoard(x,y);
-                int bTemp = rgb & 255;
-                int gTemp = (rgb >> 8) & 255;
-                int rTemp = (rgb >> 16) & 255;
-                int plNo = _client.getRemoteClient().getMyPlayerNumber();
-                if (rTemp == bTemp && rTemp == 255)
-                    continue;
-
-                if( plNo==0 && rTemp>=125 ) {
-                    has_my_color=true;
-                }
-                else
-                if( plNo==1 && gTemp>=125 ) {
-                    has_my_color=true;
-                }
-                else
-                if( plNo==2 && bTemp>=125 ) {
-                    has_my_color=true;
                 }
             }
         }
@@ -212,7 +207,7 @@ public class Board implements Cloneable {
             weight = 10;
         }
         if( has_non_walkable ) {
-            weight=0;
+            weight=1;
         }
         return weight;
     }
