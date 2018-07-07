@@ -103,8 +103,6 @@ public class Client {
             }
         }
 
-
-        board.getRaster(128);
         try {
             saveLoop.join();
         } catch (InterruptedException e) {

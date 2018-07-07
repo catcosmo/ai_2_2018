@@ -1,10 +1,14 @@
 import lenz.htw.zpifub.Update;
 
+import static java.lang.Math.abs;
+import static java.lang.Math.atan;
+
 public class Bot {
     public int _botNr;
     public float _move_x;
     public float _move_y;
     public Field _pos;
+    public int _radius;
     public int _counter = 0;
     private int startAreaTurnX = 0;
     private int startAreaTurnY = 0;
@@ -23,6 +27,7 @@ public class Bot {
                 _pos = board.getField(update.x, update.y);
             }
         }
+        _radius=client.getRemoteClient().getInfluenceRadiusForBot(_botNr);
     }
 
     public void move(Board board, Client client, PowerUps powerUps) {
@@ -33,6 +38,7 @@ public class Bot {
         }
 
         moveToNearestPU(powerUps, board);
+        paintArea(board);
 
         if( //!moveToNearestPU(powerUps, board) &&
             //!paintArea(board) &&
@@ -114,16 +120,32 @@ public class Bot {
         if( _pos == null )
             return false;
 
-        Field nextField = calcNextField(board);
-        return (!nextField._isWalkable || nextField._tempBlock);
+        Field nextField = null;
+        int steps=10;
+        for( int i=0; i<steps; ++i) {
+            nextField=calcNextField(board,i);
+            if( !nextField._isWalkable || nextField._tempBlock ) {
+                System.out.println("Bot["+_botNr+"@"+_pos._x+","+_pos._y+"|"+_move_x+","+_move_y+"]::collDetect() @"+nextField._x+","+nextField._y);
+                return true;
+            }
+        }
+        if( (_pos._x+steps>1023 && _move_x>0) ||
+            (_pos._x-steps<0 && _move_x<0) ||
+            (_pos._y+steps>1023 && _move_y>0) ||
+            (_pos._y-steps<0 && _move_y<0) ) {
+            System.out.println("Bot["+_botNr+"@"+_pos._x+","+_pos._y+"|"+_move_x+","+_move_y+"]::collDetect() -> BORDERFIELD");
+            return true;
+        }
+
+        return false;
     }
 
-    private Field calcNextField(Board board){
-        float newXPosf = _pos._x + _move_x*20;
+    private Field calcNextField(Board board, int step){
+        float newXPosf = _pos._x + _move_x*step;
         int newXPos = Math.round(newXPosf);
         if(newXPos > 1023) newXPos = 1023;
         if(newXPos < 0) newXPos = 0;
-        float newYPosf = _pos._y + _move_y*20;
+        float newYPosf = _pos._y + _move_y*step;
         int newYPos = Math.round(newYPosf);
         if(newYPos > 1023) newYPos = 1023;
         if(newYPos < 0) newYPos = 0;
@@ -137,17 +159,35 @@ public class Bot {
 
         float move_x = 0.0f;
         float move_y = 0.0f;
+        double angle = 45;
 
-        if (collDetect(board)) {
-            float[] moveVector = calcNewDirVector(180);
-            move_x = moveVector[0];
-            move_y = moveVector[1];
+        if( collDetect(board) ) {
+            float[] moveVector = calcNewDirVector(angle);
+            move_x = (moveVector[0]) % 1;
+            move_y = (moveVector[1]) % 1;
+//            if( _move_x>0 && move_y>0 ) {
+//                move_x *= -1;
+//            }
+//            if( _move_y>0 && move_y>0 ) {
+//                move_y *= -1;
+//            }
+            System.out.println("Bot["+_botNr+"@"+_pos._x+","+_pos._y+"|"+move_x+","+move_y+"]::paintArea() -> COLL Turn!");
             startAreaTurnX = _pos._x;
             startAreaTurnY = _pos._y;
-        } else if (startAreaTurnY != 0 || startAreaTurnX != 0 || (startAreaTurnX-_pos._x)+(startAreaTurnY-_pos._y)>40){
-            float[] moveVector = calcNewDirVector(180);
-            move_x = moveVector[0];
-            move_y = moveVector[1];
+        }
+        else
+        if( (startAreaTurnY != 0.0f || startAreaTurnX != 0.0f ) &&
+            abs(startAreaTurnX-_pos._x) +abs(startAreaTurnY-_pos._y)>2*_radius ) {
+            float[] moveVector = calcNewDirVector(angle);
+            move_x = (moveVector[0]) % 1;
+            move_y = (moveVector[1]) % 1;
+//            if( _move_x>0 && move_y>0 ) {
+//                move_x *= -1;
+//            }
+//            if( _move_y>0 && move_y>0 ) {
+//                move_y *= -1;
+//            }
+            System.out.println("Bot["+_botNr+"@"+_pos._x+","+_pos._y+"|"+move_x+","+move_y+"]::paintArea() -> 2x bot._radius drawn - Turn!");
             startAreaTurnX = 0;
             startAreaTurnY = 0;
         }
@@ -168,10 +208,10 @@ public class Bot {
     //calculate new x/y coordinates for movement direction, input angle in which to change
     private float[] calcNewDirVector(double angle){
         float[] vector = new float[2];
-        int x = _pos._x;
-        int y = _pos._y;
+        double x = _pos._x;
+        double y = _pos._y;
 
-        double radians = Math.toRadians(angle);
+        double radians = angle;// Math.toRadians(angle);
         double cos = Math.cos(radians);
         double sin = Math.sin(radians);
         double xNew = (x * cos) - (y * sin);
