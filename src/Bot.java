@@ -12,6 +12,9 @@ public class Bot {
     public int _counter = 0;
     private int startAreaTurnX = 0;
     private int startAreaTurnY = 0;
+    private double _away_angle=0.0;
+    private Field _old_pos;
+    private int _old_cycle=0;
 
 
     public Bot(int botNr, float move_x, float move_y) {
@@ -21,7 +24,7 @@ public class Bot {
     }
 
     private void log(String msg) {
-        System.out.println("Bot["+_botNr+"@"+_pos._x+","+_pos._y+"|"+_move_x+","+_move_y+"]"+msg);
+        System.out.println(Board._updateNo+": Bot["+_botNr+"@"+_pos._x+","+_pos._y+"|"+_move_x+","+_move_y+"]"+msg);
     }
 
     public void updatePos(Update update, Board board, Client client) {
@@ -41,16 +44,37 @@ public class Bot {
             _pos = board.getBotPos(_botNr);
         }
 
-        moveToNearestPU(powerUps, board);
-        paintArea(board);
-
-        if( //!moveToNearestPU(powerUps, board) &&
-            //!paintArea(board) &&
-            collDetect(board, _move_x, _move_y) ) {
+        if(  didNotMove() ) {
             _move_x = _move_x*-1;
             _move_y = _move_y*-1;
         }
+        else {
+            moveToNearestPU(powerUps, board);
+            paintArea(board);
+
+            if ( //!moveToNearestPU(powerUps, board) &&
+                //!paintArea(board) &&
+                    collDetect(board, _move_x, _move_y)) {
+                _move_x = _move_x * -1;
+                _move_y = _move_y * -1;
+            }
+        }
         client.getRemoteClient().setMoveDirection(_botNr, _move_x, _move_y);
+    }
+
+    private boolean didNotMove() {
+        if( _pos==null || _old_pos==null)
+            return false;
+
+        if( abs(_old_pos._x - _pos._x)<=16 ||
+            abs(_old_pos._y - _pos._y)<=16 ) {
+            log("didNotMove() > detected");
+            return true;
+        }
+
+        _old_pos = _pos;
+        _old_cycle = Board._updateNo;
+        return false;
     }
 
     public boolean moveToNearestPU(PowerUps powerUps, Board board) {
@@ -130,24 +154,50 @@ public class Bot {
             nextField=calcNextField(board,intentedX, intendedY, i);
             if( !nextField._isWalkable || nextField._tempBlock ) {
                 log("::collDetect() @"+nextField.toString());
-                // LOG SURROUNDING FIELDS of collision
+                _away_angle = awayAngleFromMe(nextField);
+//                // LOG SURROUNDING FIELDS of collision
 //                for(int fooX=-1; fooX<2; ++fooX) {
 //                    for( int fooY=-1; fooY<2; ++fooY) {
 //                        int nbX = nextField._x + fooX;
 //                        int nbY = nextField._y + fooY;
+//                        if( nbX>1023 ) nbX=1023;
+//                        if( nbX<0 ) nbX=0;
+//                        if( nbY>1023 ) nbY=1023;
+//                        if( nbY<0 ) nbY=0;
 //                        log("::collDetect()      NB FIELDS:"+board._board[nbX][nbY].toString());
+//                    }
+//                }
+
+//                // LOG SURROUNDING FIELDS
+//                for(int fooX=-1; fooX<2; ++fooX) {
+//                    for( int fooY=-1; fooY<2; ++fooY) {
+//                        int nbX = _pos._x + fooX*17;
+//                        int nbY = _pos._y + fooY*17;
+//                        if( nbX>1023 ) nbX=1023;
+//                        if( nbX<0 ) nbX=0;
+//                        if( nbY>1023 ) nbY=1023;
+//                        if( nbY<0 ) nbY=0;
+//                        log("::collDetect() MY NB FIELDS:"+board._board[nbX][nbY].toString());
 //                    }
 //                }
                 return true;
             }
         }
 
-        // LOG SURROUNDING FIELDS
+//        // check surrounding fields
 //        for(int fooX=-1; fooX<2; ++fooX) {
 //            for( int fooY=-1; fooY<2; ++fooY) {
-//                int nbX = _pos._x + fooX;
-//                int nbY = _pos._y + fooY;
-//                log("::collDetect() MY NB FIELDS:"+board._board[nbX][nbY].toString());
+//                int nbX = _pos._x + fooX*17;
+//                int nbY = _pos._y + fooY*17;
+//                if( nbX>1023 ) nbX=1023;
+//                if( nbX<0 ) nbX=0;
+//                if( nbY>1023 ) nbY=1023;
+//                if( nbY<0 ) nbY=0;
+//                Field field=board._board[nbX][nbY];
+//                if( !field._isWalkable || field._tempBlock ) {
+//                    log("::collDetect() COLL on NB FIELD@" + nextField.toString());
+//                    return true;
+//                }
 //            }
 //        }
 
@@ -184,30 +234,33 @@ public class Bot {
         double angle = 45;
 
         if( collDetect(board,_move_x,_move_y) ) {
-            move_x = _move_x;
-            move_y = _move_y;
-            while( collDetect(board,move_x,move_y)) {
-                angle *=-1;
-                float[] moveVector = calcNewDirVector(angle);
-                move_x = (moveVector[0]) % 1;
-                move_y = (moveVector[1]) % 1;
-            }
+            float[] moveVector = calcNewDirVector(angle);
+            move_x = _move_x + (moveVector[0]) % 1;
+            move_y = _move_x + (moveVector[1]) % 1;
             log("::paintArea() -> COLL Turn!");
+            if( collDetect(board,move_x,move_y)) {
+                log("::paintArea() -> COLL Turn on NEW direction -> turn away");
+                moveVector = calcNewDirVector(_away_angle);
+                move_x = _move_x + (moveVector[0]) % 1;
+                move_y = _move_x + (moveVector[1]) % 1;
+            }
             startAreaTurnX = _pos._x;
             startAreaTurnY = _pos._y;
         }
         else
         if( (startAreaTurnY != 0.0f || startAreaTurnX != 0.0f ) &&
             abs(startAreaTurnX-_pos._x) +abs(startAreaTurnY-_pos._y)>2*_radius ) {
-            move_x = _move_x;
-            move_y = _move_y;
-            while( collDetect(board,move_x,move_y)) {
-                angle *=-1;
-                float[] moveVector = calcNewDirVector(angle);
+            log("::paintArea() -> 2x bot._radius drawn - Turn!");
+            float[] moveVector = calcNewDirVector(angle);
+            move_x = _move_x + (moveVector[0]) % 1;
+            move_y = _move_x + (moveVector[1]) % 1;
+            if( collDetect(board,move_x,move_y)) {
+                log("::paintArea() -> 2x bot._radius drawn - Turn! Coll on new dir! -> turnaround");
+                angle *= -1;
+                moveVector = calcNewDirVector(angle);
                 move_x = (moveVector[0]) % 1;
                 move_y = (moveVector[1]) % 1;
             }
-            log("::paintArea() -> 2x bot._radius drawn - Turn!");
             startAreaTurnX = 0;
             startAreaTurnY = 0;
         }
@@ -240,5 +293,13 @@ public class Bot {
         vector[1] = (float) yNew;
 
         return vector;
+    }
+
+    private double awayAngleFromMe(Field field) {
+        double angle = 0.0;
+        double a = abs( _pos._y - field._y);
+        double b = abs( _pos._x - field._x);
+        angle = Math.atan( b/a );
+        return angle;
     }
 }

@@ -7,7 +7,7 @@ public class Board implements Cloneable {
     Field[][] _board = new Field[1024][1024];
     Client _client = null;
     DrawPanel _draw = new DrawPanel();
-    int _updateNo = 0;
+    public static int _updateNo = 0;
 
     public Board(Client client) {
         _client=client;
