@@ -186,9 +186,11 @@ public class Bot {
         // DIRECT MOVE to target
         if( !_use_dijkstra ) {
 
-        } else {
+        }
+        else
+        if( fastBot ) {
             //Djikstra move to target
-            RasterNode[] all_nodes = board.getRaster(RASTER_SIZE_DIJKSTRA, 3, 10000, false);
+            RasterNode[] all_nodes = board.getRaster(RASTER_SIZE_DIJKSTRA, 9, 1000000, fastBot);
             RasterNode.addAdjacencyLists(all_nodes);
 
             int me = board.getRasterID(_pos._x, _pos._y, RASTER_SIZE_DIJKSTRA);
