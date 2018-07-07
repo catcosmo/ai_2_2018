@@ -46,7 +46,7 @@ public class Bot {
 
         if( //!moveToNearestPU(powerUps, board) &&
             //!paintArea(board) &&
-            collDetect(board) ) {
+            collDetect(board, _move_x, _move_y) ) {
             _move_x = _move_x*-1;
             _move_y = _move_y*-1;
         }
@@ -120,14 +120,14 @@ public class Bot {
         return true;
     }
 
-    private boolean collDetect(Board board){
+    private boolean collDetect(Board board, float intentedX, float intendedY){
         if( _pos == null )
             return false;
 
         Field nextField = null;
-        int steps=10;
+        int steps=17;//_radius+1;
         for( int i=0; i<steps; ++i) {
-            nextField=calcNextField(board,i);
+            nextField=calcNextField(board,intentedX, intendedY, i);
             if( !nextField._isWalkable || nextField._tempBlock ) {
                 log("::collDetect() @"+nextField.toString());
                 // LOG SURROUNDING FIELDS of collision
@@ -141,6 +141,16 @@ public class Bot {
                 return true;
             }
         }
+
+        // LOG SURROUNDING FIELDS
+//        for(int fooX=-1; fooX<2; ++fooX) {
+//            for( int fooY=-1; fooY<2; ++fooY) {
+//                int nbX = _pos._x + fooX;
+//                int nbY = _pos._y + fooY;
+//                log("::collDetect() MY NB FIELDS:"+board._board[nbX][nbY].toString());
+//            }
+//        }
+
         if( (_pos._x+steps>1023 && _move_x>0) ||
             (_pos._x-steps<0 && _move_x<0) ||
             (_pos._y+steps>1023 && _move_y>0) ||
