@@ -57,9 +57,17 @@ public class Bot {
             _move_y = _move_y*-1;
         }
         else {
-            moveToNearestPU(powerUps, board);
+            // give it a direction
+            if( !moveToNearestPU(powerUps, board) ) {
+                moveToHottestArea(board);
+            }
+
+            // turn on next collision
+            // whatever way we are
+            // and paint area
             paintArea(board);
 
+            // safety collision check
             if (collDetect(board, _move_x, _move_y)) {
                 _move_x = _move_x * -1;
                 _move_y = _move_y * -1;
@@ -171,6 +179,7 @@ public class Bot {
         if (!isPathClear(move_x, move_y, fieldCenterX, fieldCenterY, board)) {
             return false;
         }
+
         if( move_x!=0.0f || move_y!=0.0f) {
             _move_x = move_x;
             _move_y = move_y;

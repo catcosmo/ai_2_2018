@@ -7,17 +7,8 @@ public class Graph {
 
     private Set<RasterNode> rasterNodes = new HashSet<>();
 
-    public void addRasterNode(RasterNode rasterNodeA) {
-        rasterNodes.add(rasterNodeA);
-    }
-    
-    public void fillGraph(Graph graph, RasterNode[] rasterNodes){
-        for (int node = 0; node < rasterNodes.length; node++) {
-            graph.addRasterNode(rasterNodes[node]);
-        }
-    }
-
-    public static Graph calculateShortestPathFromSource(Graph graph, RasterNode source) {
+    public Graph calculateShortestPathFromSource(Graph graph, RasterNode[] rasterNodes, RasterNode source) {
+        fillGraph(rasterNodes);
         source.set_distance(0);
 
         Set<RasterNode> settledRasterNodes = new HashSet<>();
@@ -40,6 +31,16 @@ public class Graph {
             settledRasterNodes.add(currentRasterNode);
         }
         return graph;
+    }
+
+    private void addRasterNode(RasterNode rasterNodeA) {
+        rasterNodes.add(rasterNodeA);
+    }
+
+    private void fillGraph(RasterNode[] rasterNodes){
+        for (int node = 0; node < rasterNodes.length; node++) {
+            addRasterNode(rasterNodes[node]);
+        }
     }
 
     private static RasterNode getLowestDistanceRasterNode(Set < RasterNode > unsettledRasterNodes) {
