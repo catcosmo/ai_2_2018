@@ -6,7 +6,7 @@ import static java.lang.Math.abs;
 import static java.lang.Math.sqrt;
 
 public class Bot {
-    private static final boolean _use_dijkstra = false;
+    private static final boolean _use_dijkstra = true;
 
     public int _botNr;
     public float _move_x;
@@ -57,11 +57,12 @@ public class Bot {
             _pos = board.getBotPos(_botNr);
         }
 
-        if(  didNotMove() ) {
-            _move_x = _move_x*-1;
-            _move_y = _move_y*-1;
-        }
-        else {
+//        if(  didNotMove() ) {
+//            _move_x = _move_x*-1;
+//            _move_y = _move_y*-1;
+//        }
+//        else
+            {
             // give it a direction
 //            if( !moveToNearestPU(powerUps, board) ) {
                 moveToHottestArea(board);
@@ -186,6 +187,8 @@ public class Bot {
         } else {
             //Djikstra move to target
             RasterNode[] all_nodes = board.getRaster(32, 3, 10000, false);
+            RasterNode.addAdjacencyLists(all_nodes);
+
             int me = board.getRasterID(_pos._x, _pos._y, 32);
             RasterNode my_node = all_nodes[me];
             Graph.calculateShortestPathFromSource(all_nodes, my_node);
@@ -195,8 +198,10 @@ public class Bot {
             if (_my_way.size() == 0) {
                 log(" djisktra empty!");
             } else {
-                fieldCenterX = _my_way.get(0).get_startX() + rasterNode.get_size() / 2;
-                fieldCenterY = _my_way.get(0).get_startY() + rasterNode.get_size() / 2;
+                RasterNode firstNode = _my_way.get(0);
+                fieldCenterX = firstNode.get_startX() + rasterNode.get_size() / 2;
+                fieldCenterY = firstNode.get_startY() + rasterNode.get_size() / 2;
+                log(" djisktra OK! wp:" + _my_way.size() + " 1st:" + fieldCenterX + "," + fieldCenterY );
             }
         }
 

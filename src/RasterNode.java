@@ -23,16 +23,15 @@ public class RasterNode {
     }
 
     //fill list of neighbouring rasters
-    public void addAdjacencyList(RasterNode[] rasterNodes){
+    public static void addAdjacencyLists(RasterNode[] rasterNodes){
         for (int srcNode = 0; srcNode < rasterNodes.length; srcNode++) {
             RasterNode sourceNode = rasterNodes[srcNode];
             for (int neighbour = 0; neighbour < rasterNodes.length; neighbour++) {
                 if(Math.abs(rasterNodes[neighbour].get_startX()-sourceNode.get_startX())<=sourceNode.get_size() &&
                         Math.abs(rasterNodes[neighbour].get_startY()-sourceNode.get_startY())<=sourceNode.get_size() ){
-                    _addDestination(rasterNodes[neighbour],rasterNodes[neighbour]._weight);
+                    sourceNode._addDestination(rasterNodes[neighbour],rasterNodes[neighbour]._weight);
                 }
             }
-
         }
     }
 
