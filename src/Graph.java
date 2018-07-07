@@ -10,6 +10,12 @@ public class Graph {
     public void addRasterNode(RasterNode rasterNodeA) {
         rasterNodes.add(rasterNodeA);
     }
+    
+    public void fillGraph(Graph graph, RasterNode[] rasterNodes){
+        for (int node = 0; node < rasterNodes.length; node++) {
+            graph.addRasterNode(rasterNodes[node]);
+        }
+    }
 
     public static Graph calculateShortestPathFromSource(Graph graph, RasterNode source) {
         source.set_distance(0);
