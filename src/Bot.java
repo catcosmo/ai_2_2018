@@ -166,10 +166,10 @@ public class Bot {
         //get hottest area
         RasterNode rasterNode = board.getHotArea(rasterNodes, this);
         if( _hottest_area!=null && _hottest_area.get_numberID()==rasterNode.get_numberID() ) {
-                return false;
-        }
 
-        log("Hottest Area is:" + rasterNode.get_numberID());
+        } else {
+            log("Hottest Area is:" + rasterNode.get_numberID());
+        }
         _hottest_area = rasterNode;
 
         //get x,y coordinates of center = goal
