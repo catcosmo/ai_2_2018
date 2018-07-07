@@ -79,7 +79,7 @@ public class Client {
         Bot bot1 = new Bot(1, 1, 0); // bot 1 nach rechts unten
         Bot bot2 = new Bot(2, 0, 1); // bot 1 nach rechts unten
 
-        Thread saveLoop = startSaveLoop(board);
+        //Thread saveLoop = startSaveLoop(board);
 
         while( client.isAlive() ) {
             Update update;
@@ -90,12 +90,7 @@ public class Client {
                 bot0.updatePos(update, board, this);
                 bot1.updatePos(update, board, this);
                 bot2.updatePos(update, board, this);
-                RasterNode[] rasterNodes = board.getRaster(128);
-                board.getHotArea(rasterNodes, bot2);
-
             }
-
-            //board.getHotArea(rasterNodes, bot2);
 
             // move AFTER all updates are processed
             bot0.move(board, this, powerUps);
@@ -108,9 +103,10 @@ public class Client {
             }
         }
 
-        try {
-            saveLoop.join();
-        } catch (InterruptedException e) {
-        }
+//        try {
+//            saveLoop.join();
+//        } catch (InterruptedException e) {
+//        }
     }
 }
+

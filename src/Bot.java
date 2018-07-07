@@ -1,6 +1,7 @@
 import lenz.htw.zpifub.Update;
 
 import static java.lang.Math.abs;
+import static java.lang.Math.sqrt;
 
 public class Bot {
     public int _botNr;
@@ -14,6 +15,7 @@ public class Bot {
     private double _away_angle=0.0;
     private Field _old_pos;
     private int _old_cycle=0;
+    private boolean _did_not_move=false;
 
 
     public Bot(int botNr, float move_x, float move_y) {
@@ -31,6 +33,13 @@ public class Bot {
             if( update.player==client.getRemoteClient().getMyPlayerNumber() &&
                 update.bot==_botNr) {
                 _pos = board.getField(update.x, update.y);
+                if( _old_pos==null) {
+//                    _old_pos=_pos;
+//                    _old_cycle = Board._updateNo;
+                }
+                else {
+                    //checkDidNotMove();
+                }
             }
         }
         _radius=client.getRemoteClient().getInfluenceRadiusForBot(_botNr);
@@ -51,10 +60,7 @@ public class Bot {
             moveToNearestPU(powerUps, board);
             paintArea(board);
 
-            if (//!moveToNearestPU(powerUps, board) &&
-                //!moveToHottestArea &&
-                //!paintArea(board) &&
-                    collDetect(board, _move_x, _move_y)) {
+            if (collDetect(board, _move_x, _move_y)) {
                 _move_x = _move_x * -1;
                 _move_y = _move_y * -1;
             }
@@ -62,16 +68,48 @@ public class Bot {
         client.getRemoteClient().setMoveDirection(_botNr, _move_x, _move_y);
     }
 
+    private void checkDidNotMove() {
+        if( _did_not_move ) {
+            _did_not_move = false;
+            log("::checkDidNotMove() reset flag");
+            return;
+        }
+        int diffX = abs(_old_pos._x - _pos._x);
+        int diffY = abs(_old_pos._y - _pos._y);
+        if( diffX > 0 || diffY > 0 ) {
+            double moved = sqrt(diffX^2 + diffY^2);
+            //if( diffX <= 10 && diffY <= 10 ){
+            if( moved < 2.3 && diffX<4 && diffY<4 ) {
+                _did_not_move = true;
+                log("::checkDidNotMove() didNotMove NOK >"+_old_cycle+"< old:"+_old_pos._x+","+_old_pos._y+" cur:"+_pos._x+","+_pos._y + "-> "+diffX+","+diffY+" moved:"+moved);
+            }
+            else {
+                //log("::checkDidNotMove() didNotMove OK >"+_old_cycle+"< old:"+_old_pos._x+","+_old_pos._y+" cur:"+_pos._x+","+_pos._y + "-> "+diffX+","+diffY+" moved:"+moved);
+            }
+        } else {
+            log("::checkDidNotMove() didNotMove NOK SAME >"+_old_cycle+"< old:"+_old_pos._x+","+_old_pos._y+" cur:"+_pos._x+","+_pos._y + "-> "+diffX+","+diffY);
+            _did_not_move = true;
+        }
+    }
+
     private boolean didNotMove() {
-        if( _pos==null || _old_pos==null)
+        if( _pos==null )
             return false;
 
-        if( abs(_old_pos._x - _pos._x)<=16 ||
-            abs(_old_pos._y - _pos._y)<=16 ) {
-            log("didNotMove() > detected");
+        if( _old_pos==null ) {
+            _old_pos = _pos;
+            _old_cycle = Board._updateNo;
+            return false;
+        }
+
+        checkDidNotMove();
+        if( _did_not_move ) {
             return true;
         }
 
+        // UPDATE OLD POS HERE
+        // so that checkDidNotMove()
+        // can check for same Pos!!!
         _old_pos = _pos;
         _old_cycle = Board._updateNo;
         return false;
@@ -189,7 +227,7 @@ public class Bot {
         for( int i=0; i<steps; ++i) {
             nextField=calcNextField(board,intentedX, intendedY, i);
             if( !nextField._isWalkable || nextField._tempBlock ) {
-                log("::collDetect() @"+nextField.toString());
+                //log("::collDetect() @"+nextField.toString());
                 _away_angle = awayAngleFromMe(nextField);
 //                // LOG SURROUNDING FIELDS of collision
 //                for(int fooX=-1; fooX<2; ++fooX) {
@@ -273,9 +311,9 @@ public class Bot {
             float[] moveVector = calcNewDirVector(angle);
             move_x = _move_x + (moveVector[0]) % 1;
             move_y = _move_x + (moveVector[1]) % 1;
-            log("::paintArea() -> COLL Turn!");
+            //log("::paintArea() -> COLL Turn!");
             if( collDetect(board,move_x,move_y)) {
-                log("::paintArea() -> COLL Turn on NEW direction -> turn away");
+                //log("::paintArea() -> COLL Turn on NEW direction -> turn away");
                 moveVector = calcNewDirVector(_away_angle);
                 move_x = _move_x + (moveVector[0]) % 1;
                 move_y = _move_x + (moveVector[1]) % 1;
@@ -286,12 +324,12 @@ public class Bot {
         else
         if( (startAreaTurnY != 0.0f || startAreaTurnX != 0.0f ) &&
             abs(startAreaTurnX-_pos._x) +abs(startAreaTurnY-_pos._y)>2*_radius ) {
-            log("::paintArea() -> 2x bot._radius drawn - Turn!");
+            //log("::paintArea() -> 2x bot._radius drawn - Turn!");
             float[] moveVector = calcNewDirVector(angle);
             move_x = _move_x + (moveVector[0]) % 1;
             move_y = _move_x + (moveVector[1]) % 1;
             if( collDetect(board,move_x,move_y)) {
-                log("::paintArea() -> 2x bot._radius drawn - Turn! Coll on new dir! -> turnaround");
+                //log("::paintArea() -> 2x bot._radius drawn - Turn! Coll on new dir! -> turnaround");
                 angle *= -1;
                 moveVector = calcNewDirVector(angle);
                 move_x = (moveVector[0]) % 1;
