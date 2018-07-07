@@ -194,10 +194,10 @@ public class Bot {
             RasterNode.addAdjacencyLists(all_nodes);
 
             int me = board.getRasterID(_pos._x, _pos._y, RASTER_SIZE_DIJKSTRA);
-            RasterNode my_node = all_nodes[me];
+            RasterNode my_node = all_nodes[me-1];
             Graph.calculateShortestPathFromSource(all_nodes, my_node);
             int tar = board.getRasterID(fieldCenterX, fieldCenterY, RASTER_SIZE_DIJKSTRA);
-            RasterNode target = all_nodes[tar];
+            RasterNode target = all_nodes[tar-1];
             _my_way = target.get_shortestPath();
             if (_my_way.size() == 0) {
                 log(" djisktra empty!");
