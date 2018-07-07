@@ -1,7 +1,6 @@
 import lenz.htw.zpifub.Update;
 
 import static java.lang.Math.abs;
-import static java.lang.Math.atan;
 
 public class Bot {
     public int _botNr;
@@ -41,12 +40,14 @@ public class Bot {
             _pos = board.getBotPos(_botNr);
         }
 
-        moveToNearestPU(powerUps, board);
-        paintArea(board);
+        //moveToNearestPU(powerUps, board);
+        //paintArea(board);
 
-        if( //!moveToNearestPU(powerUps, board) &&
+        if( !moveToNearestPU(powerUps, board) &&
             //!paintArea(board) &&
             collDetect(board, _move_x, _move_y) ) {
+            int rasterId = board.getRasterID( _pos._x, _pos._y, 128);
+            log("raster ID:"+rasterId);
             _move_x = _move_x*-1;
             _move_y = _move_y*-1;
         }

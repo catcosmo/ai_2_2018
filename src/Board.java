@@ -1,6 +1,5 @@
 import lenz.htw.zpifub.Update;
 
-import static lenz.htw.zpifub.PowerupType.RAIN;
 import static lenz.htw.zpifub.PowerupType.SLOW;
 
 public class Board implements Cloneable {
@@ -60,7 +59,7 @@ public class Board implements Cloneable {
             _board[update.x][update.y]._hasPU = false;
             // clean up CLOCK barrier
             if(_board[update.x][update.y]._tempBlock){
-                // System.out.println("TenpBlockRemove x:"+update.x+"y:"+update.y);
+                // System.out.println("TempBlockRemove x:"+update.x+"y:"+update.y);
 
                 for (int x = update.x-20; x <= update.x+20 ; x++) {
                     for (int y = update.y - 20; y <= update.y + 20; y++) {
@@ -89,7 +88,10 @@ public class Board implements Cloneable {
 
     //calculate hot area for bot
     public RasterNode getHotArea(RasterNode[] rasterNodes, Bot bot){
-        int botRadius = _client.getRemoteClient().getInfluenceRadiusForBot(bot._botNr);
+        if( bot._pos==null )
+            return rasterNodes[0];
+
+        int botRadius = bot._radius;
         int best = 0;
         int hottestArea = 1;
         int closest = 0;
@@ -97,7 +99,6 @@ public class Board implements Cloneable {
             //if brush is slow, check nearer neighbourhood only
             //spraycan gets the whole field to play in
             //small brush
-            // TODO fixnullpointer exception
             if(botRadius == 15 &&
                     ((bot._pos._x-rasterNodes[i].get_startX())>512
                         || (bot._pos._y-rasterNodes[i].get_startY())>512)){
@@ -124,8 +125,30 @@ public class Board implements Cloneable {
                 }
             }
         }
-        System.out.println("Hottest Area for this bot is" + rasterNodes[hottestArea].get_numberID());
+        System.out.println("Hottest Area for this bot is: " + rasterNodes[hottestArea].get_numberID());
         return rasterNodes[hottestArea];
+    }
+
+    //return raster field ID of current position
+    public int getRasterID(int x, int y, int rasterSize){
+        int rasterID;
+        int xID;
+        int yID;
+        int axisRasterNo = 1024/rasterSize;
+
+        // calc xPos
+        if(x%rasterSize==0)
+            xID = x/rasterSize;
+        else xID = x/rasterSize +1;
+
+        //calc yPos
+        if(y%rasterSize==0)
+            yID = y/rasterSize;
+        else yID = y/rasterSize +1;
+
+        //add xPos & yPos to calculate field
+        rasterID = xID + ((yID-1)*axisRasterNo);
+        return rasterID;
     }
 
 
@@ -135,8 +158,8 @@ public class Board implements Cloneable {
         RasterNode[] rasterNodes = new RasterNode[(_board.length/rasterSize)*(_board.length/rasterSize)];
         for (int y = 0; y < 1024; y+=rasterSize) {
             for (int x = 0; x < 1024; x+=rasterSize) {
-                int weight = calcRasterWeight(x, y, rasterSize);
-                System.out.println("Weight for Raster:" + counter + " is:" + weight);
+                int weight = calcRasterWeight(x, y, rasterSize, 0);
+                //System.out.println("Weight for Raster:" + counter + " is:" + weight);
                 RasterNode rasterNode = new RasterNode(x, y, rasterSize, counter, weight);
                 rasterNodes[counter] = rasterNode;
                 counter+=1;
@@ -146,7 +169,9 @@ public class Board implements Cloneable {
     }
 
     //calculate _weight colour (or weight??) of raster node
-    private int calcRasterWeight(int startX, int startY, int rasterSize) {
+    //avoidBlackFactor: factor with which black pixels are multiplied:
+    //for hotAreaDtection 0, for pathfinding (smaller raster) e.g. 1000
+    private int calcRasterWeight(int startX, int startY, int rasterSize, int avoidBlackFactor) {
         int weight = 0;
         int rgb;
         int r = 0; //r, g, b total sum of all fields - the higher, the better the area for that color
@@ -180,29 +205,29 @@ public class Board implements Cloneable {
                     switch (_client.getRemoteClient().getMyPlayerNumber()) {
                         case 0:
                             if(rTemp <= 125)
-                                r+=rTemp;
-                            b += bTemp;
-                            g += gTemp;
+                                r += rTemp;
+                                b += bTemp*3;
+                                g += gTemp*3;
                             break;
                         case 1:
                             if(gTemp <= 125)
-                                g+=gTemp;
-                            b += bTemp;
-                            r+=rTemp;
+                                g += gTemp;
+                                b += bTemp*3;
+                                r += rTemp*3;
                             break;
                         case 2:
                             if(bTemp <= 125)
                                 b+=bTemp;
-                            r+=rTemp;
-                            g += gTemp;
+                                r += rTemp*3;
+                                g += gTemp*3;
                             break;
                     }
                 }
-                //TODO finish method & logic
             }
         }
         //current weighting: white is more important than colors, black doesnt give negative values
-        weight = r+g+b+w;
+        s = s*avoidBlackFactor*-1;
+        weight = r+g+b+w+s;
         return weight;
     }
 	
