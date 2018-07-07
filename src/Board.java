@@ -1,5 +1,7 @@
 import lenz.htw.zpifub.Update;
 
+import java.util.List;
+
 import static lenz.htw.zpifub.PowerupType.SLOW;
 
 public class Board implements Cloneable {
@@ -270,5 +272,15 @@ public class Board implements Cloneable {
     @Override
     protected Object clone() throws CloneNotSupportedException {
         return super.clone();
+    }
+
+    public void saveBoard(final List<RasterNode> my_way) {
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                _draw.save(Board.this,"dijkstra_" + _updateNo + ".png", my_way);
+            }
+        });
+        thread.start();
     }
 }

@@ -7,6 +7,8 @@ import static java.lang.Math.sqrt;
 
 public class Bot {
     private static final boolean _use_dijkstra = true;
+    public static final int RASTER_SIZE_HOTAREA=128;
+    public static final int RASTER_SIZE_DIJKSTRA=32;
 
     public int _botNr;
     public float _move_x;
@@ -166,7 +168,7 @@ public class Bot {
         //check if fast bot, if so: prioritize white areas
         boolean fastBot = _radius==40;
         //SIZE AND WEIGHT OF HOT AREA RASTER DEFINED HERE!
-        RasterNode[] rasterNodes = board.getRaster(128, 3, 0, fastBot );
+        RasterNode[] rasterNodes = board.getRaster(RASTER_SIZE_HOTAREA, 3, 0, fastBot );
 
         //get hottest area
         RasterNode rasterNode = board.getHotArea(rasterNodes, this);
@@ -186,22 +188,23 @@ public class Bot {
 
         } else {
             //Djikstra move to target
-            RasterNode[] all_nodes = board.getRaster(32, 3, 10000, false);
+            RasterNode[] all_nodes = board.getRaster(RASTER_SIZE_DIJKSTRA, 3, 10000, false);
             RasterNode.addAdjacencyLists(all_nodes);
 
-            int me = board.getRasterID(_pos._x, _pos._y, 32);
+            int me = board.getRasterID(_pos._x, _pos._y, RASTER_SIZE_DIJKSTRA);
             RasterNode my_node = all_nodes[me];
             Graph.calculateShortestPathFromSource(all_nodes, my_node);
-            int tar = board.getRasterID(fieldCenterX, fieldCenterY, 32);
+            int tar = board.getRasterID(fieldCenterX, fieldCenterY, RASTER_SIZE_DIJKSTRA);
             RasterNode target = all_nodes[tar];
             _my_way = target.get_shortestPath();
             if (_my_way.size() == 0) {
                 log(" djisktra empty!");
             } else {
                 RasterNode firstNode = _my_way.get(0);
-                fieldCenterX = firstNode.get_startX() + rasterNode.get_size() / 2;
-                fieldCenterY = firstNode.get_startY() + rasterNode.get_size() / 2;
+                fieldCenterX = firstNode.get_startX() + firstNode.get_size() / 2;
+                fieldCenterY = firstNode.get_startY() + firstNode.get_size() / 2;
                 log(" djisktra OK! wp:" + _my_way.size() + " 1st:" + fieldCenterX + "," + fieldCenterY );
+                board.saveBoard(_my_way);
             }
         }
 
