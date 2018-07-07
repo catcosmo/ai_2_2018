@@ -5,9 +5,9 @@ import java.util.Set;
 
 public class Graph {
 
-    private Set<RasterNode> rasterNodes = new HashSet<>();
+    private static Set<RasterNode> rasterNodes = new HashSet<>();
 
-    public Graph calculateShortestPathFromSource(Graph graph, RasterNode[] rasterNodes, RasterNode source) {
+    public static void calculateShortestPathFromSource(RasterNode[] rasterNodes, RasterNode source) {
         fillGraph(rasterNodes);
         source.set_distance(0);
 
@@ -30,14 +30,14 @@ public class Graph {
             }
             settledRasterNodes.add(currentRasterNode);
         }
-        return graph;
+        return;
     }
 
-    private void addRasterNode(RasterNode rasterNodeA) {
+    private static void addRasterNode(RasterNode rasterNodeA) {
         rasterNodes.add(rasterNodeA);
     }
 
-    private void fillGraph(RasterNode[] rasterNodes){
+    private static void fillGraph(RasterNode[] rasterNodes){
         for (int node = 0; node < rasterNodes.length; node++) {
             addRasterNode(rasterNodes[node]);
         }

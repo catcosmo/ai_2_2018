@@ -1,9 +1,13 @@
 import lenz.htw.zpifub.Update;
 
+import java.util.List;
+
 import static java.lang.Math.abs;
 import static java.lang.Math.sqrt;
 
 public class Bot {
+    private static final boolean _use_dijkstra = false;
+
     public int _botNr;
     public float _move_x;
     public float _move_y;
@@ -17,7 +21,7 @@ public class Bot {
     private int _old_cycle=0;
     private boolean _did_not_move=false;
     private RasterNode _hottest_area=null;
-
+    private List<RasterNode> _my_way = null;
 
     public Bot(int botNr, float move_x, float move_y) {
         _botNr = botNr;
@@ -59,9 +63,9 @@ public class Bot {
         }
         else {
             // give it a direction
-            if( !moveToNearestPU(powerUps, board) ) {
+//            if( !moveToNearestPU(powerUps, board) ) {
                 moveToHottestArea(board);
-            }
+//            }
 
             // turn on next collision
             // whatever way we are
@@ -176,7 +180,27 @@ public class Bot {
         int fieldCenterX = rasterNode.get_startX()+rasterNode.get_size()/2;
         int fieldCenterY = rasterNode.get_startY()+rasterNode.get_size()/2;
 
-        //calculate movement vector to goal
+        // DIRECT MOVE to target
+        if( !_use_dijkstra ) {
+
+        } else {
+            //Djikstra move to target
+            RasterNode[] all_nodes = board.getRaster(32, 3, 10000, false);
+            int me = board.getRasterID(_pos._x, _pos._y, 32);
+            RasterNode my_node = all_nodes[me];
+            Graph.calculateShortestPathFromSource(all_nodes, my_node);
+            int tar = board.getRasterID(fieldCenterX, fieldCenterY, 32);
+            RasterNode target = all_nodes[tar];
+            _my_way = target.get_shortestPath();
+            if (_my_way.size() == 0) {
+                log(" djisktra empty!");
+            } else {
+                fieldCenterX = _my_way.get(0).get_startX() + rasterNode.get_size() / 2;
+                fieldCenterY = _my_way.get(0).get_startY() + rasterNode.get_size() / 2;
+            }
+        }
+
+        // calculate movement vector to FIRST node on way
         int diffX = (_pos._x - fieldCenterX) * -1;
         int diffY = (_pos._y - fieldCenterY) * -1;
         float dist = (float) Math.sqrt((diffX * diffX) + (diffY * diffY));
@@ -187,11 +211,12 @@ public class Bot {
             return false;
         }
 
-        if( move_x!=0.0f || move_y!=0.0f) {
+        if (move_x != 0.0f || move_y != 0.0f) {
             _move_x = move_x;
             _move_y = move_y;
             return true;
         }
+
         return false;
     }
 
