@@ -80,8 +80,12 @@ public class DrawPanel extends JPanel {
             for (RasterNode rasterNode : my_way) {
                 if( rasterNode==my_way.get(0) || rasterNode==my_way.get(my_way.size()-1)){
                     pen=Bot.RASTER_SIZE_DIJKSTRA;
+                    if( rasterNode==my_way.get(0) ) {
+                        ga.setColor(Color.BLUE);
+                    }
                 } else {
                     pen = 8;
+                    ga.setColor(Color.MAGENTA);
                 }
                 int cX = rasterNode.get_startX() + rasterNode.get_size() / 2;
                 int cY = rasterNode.get_startY() + rasterNode.get_size() / 2;

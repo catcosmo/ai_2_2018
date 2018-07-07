@@ -23,6 +23,7 @@ public class Graph {
                     currentRasterNode.get_adjacentRasterNodes().entrySet()) {
                 RasterNode adjacentRasterNode = adjacencyPair.getKey();
                 Integer edgeWeight = adjacencyPair.getValue();
+                edgeWeight *= -1;
                 if (!settledRasterNodes.contains(adjacentRasterNode)) {
                     calculateMinimumDistance(adjacentRasterNode, edgeWeight, currentRasterNode);
                     unsettledRasterNodes.add(adjacentRasterNode);
