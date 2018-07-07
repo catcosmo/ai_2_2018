@@ -153,12 +153,12 @@ public class Board implements Cloneable {
 
 
     // calculate rasterNodes and store in List
-    public RasterNode[] getRaster(int rasterSize) {
+    public RasterNode[] getRaster(int rasterSize, int weightFactor, int avoidBlackFactor, boolean findWhiteSpaceg) {
         int counter = 0;
         RasterNode[] rasterNodes = new RasterNode[(_board.length/rasterSize)*(_board.length/rasterSize)];
         for (int y = 0; y < 1024; y+=rasterSize) {
             for (int x = 0; x < 1024; x+=rasterSize) {
-                int weight = calcRasterWeight(x, y, rasterSize, 0);
+                int weight = calcRasterWeight(x, y, rasterSize, weightFactor, avoidBlackFactor, false);
                 //System.out.println("Weight for Raster:" + counter + " is:" + weight);
                 RasterNode rasterNode = new RasterNode(x, y, rasterSize, counter, weight);
                 rasterNodes[counter] = rasterNode;
@@ -172,7 +172,7 @@ public class Board implements Cloneable {
     //avoidBlackFactor: factor with which black pixels are multiplied:
     //for hotAreaDtection 0, for pathfinding (smaller raster) e.g. 1000
     //bool findWhiteSpace to prioritize white pixels
-    private int calcRasterWeight(int startX, int startY, int rasterSize, int avoidBlackFactor, boolean findWhiteSpace) {
+    private int calcRasterWeight(int startX, int startY, int rasterSize, int weightFactor, int avoidBlackFactor, boolean findWhiteSpace) {
         int weight = 0;
         int rgb;
         int r = 0; //r, g, b total sum of all fields - the higher, the better the area for that color
@@ -183,7 +183,6 @@ public class Board implements Cloneable {
         int rTemp;
         int gTemp;
         int bTemp;
-        int weightFactor = 3;
 
         // go through raserNode pixel by pixel
         for (int y = startY; y < startY + rasterSize; y++) {
