@@ -1,7 +1,4 @@
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class RasterNode {
 
@@ -10,6 +7,7 @@ public class RasterNode {
     private int _size;
     private int _numberID;
     private int _weight;
+    private int _leveledNeighbourhoodWeight;
 
 
     private List<RasterNode> _shortestPath = new LinkedList<>();
@@ -28,10 +26,34 @@ public class RasterNode {
             RasterNode sourceNode = rasterNodes[srcNode];
             for (int neighbour = 0; neighbour < rasterNodes.length; neighbour++) {
                 if(Math.abs(rasterNodes[neighbour].get_startX()-sourceNode.get_startX())<=sourceNode.get_size() &&
-                        Math.abs(rasterNodes[neighbour].get_startY()-sourceNode.get_startY())<=sourceNode.get_size() ){
+                        Math.abs(rasterNodes[neighbour].get_startY()-sourceNode.get_startY())<=sourceNode.get_size() &&
+                                srcNode!=neighbour){
                     sourceNode._addDestination(rasterNodes[neighbour],rasterNodes[neighbour]._weight);
                 }
             }
+        }
+    }
+
+    public void fillHotAreaNeighbourhoodWeight(RasterNode[] rasterNodes){
+        int weightSum=0;
+        int weight;
+        // for all rasterNodes
+        for (int node = 0; node < rasterNodes.length; node++) {
+            //iterate over neighbourhood
+            Iterator it = rasterNodes[node]._adjacentRasterNodes.entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry pair = (Map.Entry) it.next();
+                weight=(int)pair.getValue();
+                //weigh immediate neighbours higher than the ones on edge
+                if(node%2==0)
+                    weight*=0.5;
+                else
+                    weight*=1;
+                //System.out.println(pair.getKey() + " = " + pair.getValue());
+                weightSum+=weight;
+            }
+            weightSum+=rasterNodes[node].get_weight()*3;
+            rasterNodes[node].set_leveledNeighbourhoodWeight(weightSum);
         }
     }
 
@@ -109,4 +131,14 @@ public class RasterNode {
     public void set_adjacentRasterNodes(Map<RasterNode, Integer> _adjacentRasterNodes) {
         this._adjacentRasterNodes = _adjacentRasterNodes;
     }
+
+    public int get_leveledNeighbourhoodWeight() {
+        return _leveledNeighbourhoodWeight;
+    }
+
+    public void set_leveledNeighbourhoodWeight(int _leveledNeighbourhoodWeight) {
+        this._leveledNeighbourhoodWeight = _leveledNeighbourhoodWeight;
+    }
+
+
 }
