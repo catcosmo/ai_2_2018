@@ -125,7 +125,6 @@ public class Board implements Cloneable {
                 }
             }
         }
-        System.out.println("Hottest Area for this bot is: " + rasterNodes[hottestArea].get_numberID());
         return rasterNodes[hottestArea];
     }
 

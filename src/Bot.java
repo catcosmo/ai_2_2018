@@ -16,6 +16,7 @@ public class Bot {
     private Field _old_pos;
     private int _old_cycle=0;
     private boolean _did_not_move=false;
+    private RasterNode _hottest_area=null;
 
 
     public Bot(int botNr, float move_x, float move_y) {
@@ -164,6 +165,12 @@ public class Bot {
 
         //get hottest area
         RasterNode rasterNode = board.getHotArea(rasterNodes, this);
+        if( _hottest_area!=null && _hottest_area.get_numberID()==rasterNode.get_numberID() ) {
+                return false;
+        }
+
+        log("Hottest Area is:" + rasterNode.get_numberID());
+        _hottest_area = rasterNode;
 
         //get x,y coordinates of center = goal
         int fieldCenterX = rasterNode.get_startX()+rasterNode.get_size()/2;
