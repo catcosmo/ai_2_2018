@@ -171,7 +171,8 @@ public class Board implements Cloneable {
     //calculate _weight colour (or weight??) of raster node
     //avoidBlackFactor: factor with which black pixels are multiplied:
     //for hotAreaDtection 0, for pathfinding (smaller raster) e.g. 1000
-    private int calcRasterWeight(int startX, int startY, int rasterSize, int avoidBlackFactor) {
+    //bool findWhiteSpace to prioritize white pixels
+    private int calcRasterWeight(int startX, int startY, int rasterSize, int avoidBlackFactor, boolean findWhiteSpace) {
         int weight = 0;
         int rgb;
         int r = 0; //r, g, b total sum of all fields - the higher, the better the area for that color
@@ -182,6 +183,7 @@ public class Board implements Cloneable {
         int rTemp;
         int gTemp;
         int bTemp;
+        int weightFactor = 3;
 
         // go through raserNode pixel by pixel
         for (int y = startY; y < startY + rasterSize; y++) {
@@ -206,26 +208,44 @@ public class Board implements Cloneable {
                         case 0:
                             if(rTemp <= 125)
                                 r += rTemp;
-                                b += bTemp*3;
-                                g += gTemp*3;
+                            if(!findWhiteSpace==true) {
+                                b += bTemp * weightFactor;
+                                g += gTemp * weightFactor;
+                            } else{
+                                b += bTemp;
+                                g += gTemp;
+                            }
                             break;
                         case 1:
                             if(gTemp <= 125)
                                 g += gTemp;
-                                b += bTemp*3;
-                                r += rTemp*3;
+                            if(!findWhiteSpace) {
+                                b += bTemp * weightFactor;
+                                r += rTemp * weightFactor;
+                            } else{
+                                b += bTemp;
+                                r += rTemp;
+                            }
                             break;
                         case 2:
                             if(bTemp <= 125)
-                                b+=bTemp;
-                                r += rTemp*3;
-                                g += gTemp*3;
+                                b += bTemp;
+                            if(!findWhiteSpace) {
+                                r += rTemp * weightFactor;
+                                g += gTemp * weightFactor;
+                            } else{
+                                r += rTemp;
+                                g += gTemp;
+                            }
                             break;
                     }
                 }
             }
         }
         //current weighting: white is more important than colors, black doesnt give negative values
+        if(findWhiteSpace) {
+            w=w*weightFactor;
+        }
         s = s*avoidBlackFactor*-1;
         weight = r+g+b+w+s;
         return weight;
