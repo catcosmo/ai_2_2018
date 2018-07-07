@@ -1,7 +1,6 @@
 import lenz.htw.zpifub.Update;
 
 import static java.lang.Math.abs;
-import static java.lang.Math.atan;
 
 public class Bot {
     public int _botNr;
