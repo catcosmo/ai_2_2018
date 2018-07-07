@@ -22,6 +22,20 @@ public class RasterNode {
         _adjacentRasterNodes.put(destination, distance);
     }
 
+    //fill list of neighbouring rasters
+    public void addAdjacencyList(RasterNode[] rasterNodes){
+        for (int sourceNode = 0; sourceNode < rasterNodes.length; sourceNode++) {
+            RasterNode sourceNode = rasterNodes[sourceNode];
+            for (int neighbour = 0; neighbour < rasterNodes.length; neighbour++) {
+                if(Math.abs(rasterNodes[neighbour].get_startX()-sourceNode.get_startX())<=sourceNode.get_size() &&
+                        Math.abs(rasterNodes[neighbour].get_startY()-sourceNode.get_startY())<=sourceNode.get_size() ){
+                    _addDestination(rasterNodes[neighbour],rasterNodes[neighbour]._weight);
+                }
+            }
+
+        }
+    }
+
 
     public RasterNode(int _startX, int _startY, int _size, int _numberID, int _weight) {
         this._startX = _startX;
