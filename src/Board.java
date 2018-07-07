@@ -184,7 +184,7 @@ public class Board implements Cloneable {
         int gTemp;
         int bTemp;
 
-        // go through raserNode pixel by pixel
+        // go through rasterNode pixel by pixel
         for (int y = startY; y < startY + rasterSize; y++) {
             for(int x = startX; x < startX + rasterSize; x++) {
                 //extract color as int 0-255
@@ -207,7 +207,7 @@ public class Board implements Cloneable {
                         case 0:
                             if(rTemp <= 125)
                                 r += rTemp;
-                            if(!findWhiteSpace==true) {
+                            if(!findWhiteSpace) {
                                 b += bTemp * weightFactor;
                                 g += gTemp * weightFactor;
                             } else{

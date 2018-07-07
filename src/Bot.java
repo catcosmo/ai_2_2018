@@ -104,11 +104,17 @@ public class Bot {
         return false;
     }
 
-    public boolean moveToHottestArea(RasterNode[] rasterNodes, Board board) {
+    public boolean moveToHottestArea(Board board) {
         if( _pos == null )
             return false;
         float move_x = 0.0f;
         float move_y = 0.0f;
+
+        //get raster
+        //check if fast bot, if so: prioritize white areas
+        boolean fastBot = _radius==40;
+        //SIZE AND WEIGHT OF HOT AREA RASTER DEFINED HERE!
+        RasterNode[] rasterNodes = board.getRaster(128, 3, 0, fastBot );
 
         //get hottest area
         RasterNode rasterNode = board.getHotArea(rasterNodes, this);
