@@ -154,12 +154,16 @@ public class Board implements Cloneable {
 
 
     // calculate rasterNodes and store in List
-    public RasterNode[] getRaster(int rasterSize, int weightFactor, int avoidBlackFactor, boolean findWhiteSpaceg) {
+    public RasterNode[] getRaster(int rasterSize, int weightFactor, int avoidBlackFactor, boolean findWhiteSpaceg, boolean walkable) {
         int counter = 0;
         RasterNode[] rasterNodes = new RasterNode[(_board.length/rasterSize)*(_board.length/rasterSize)];
         for (int y = 0; y < 1024; y+=rasterSize) {
             for (int x = 0; x < 1024; x+=rasterSize) {
-                int weight = calcRasterWeight(x, y, rasterSize, weightFactor, avoidBlackFactor, false);
+                int weight = 0;
+                if( walkable )
+                    weight = calcWalkableRasterWeight(x,y,rasterSize);
+                else
+                    weight = calcRasterWeight(x, y, rasterSize, weightFactor, avoidBlackFactor, false);
                 //System.out.println("Weight for Raster:" + counter + " is:" + weight);
                 RasterNode rasterNode = new RasterNode(x, y, rasterSize, counter, weight);
                 rasterNodes[counter] = rasterNode;
@@ -167,6 +171,50 @@ public class Board implements Cloneable {
             }
         }
         return rasterNodes;
+    }
+
+    private int calcWalkableRasterWeight(int startX, int startY, int rasterSize) {
+        // go through rasterNode pixel by pixel
+        int weight = 0;
+        boolean has_non_walkable=false;
+        boolean has_my_color = false;
+        for (int y = startY; y < startY + rasterSize; y++) {
+            for (int x = startX; x < startX + rasterSize; x++) {
+
+                if( !_client.getRemoteClient().isWalkable(x,y) ) {
+                    has_non_walkable=true;
+                } else {
+                    weight += 100;
+                }
+
+                int rgb = _client.getRemoteClient().getBoard(x,y);
+                int bTemp = rgb & 255;
+                int gTemp = (rgb >> 8) & 255;
+                int rTemp = (rgb >> 16) & 255;
+                int plNo = _client.getRemoteClient().getMyPlayerNumber();
+                if (rTemp == bTemp && rTemp == 255)
+                    continue;
+
+                if( plNo==0 && rTemp>=125 ) {
+                    has_my_color=true;
+                }
+                else
+                if( plNo==1 && gTemp>=125 ) {
+                    has_my_color=true;
+                }
+                else
+                if( plNo==2 && bTemp>=125 ) {
+                    has_my_color=true;
+                }
+            }
+        }
+        if(  has_my_color  ) {
+            weight = 10;
+        }
+        if( has_non_walkable ) {
+            weight=0;
+        }
+        return weight;
     }
 
     //calculate _weight colour (or weight??) of raster node

@@ -2,6 +2,7 @@ import lenz.htw.zpifub.Update;
 
 import java.util.List;
 
+import static java.lang.Float.isNaN;
 import static java.lang.Math.abs;
 import static java.lang.Math.sqrt;
 
@@ -80,6 +81,12 @@ public class Bot {
                 _move_x = _move_x * -1;
                 _move_y = _move_y * -1;
             }
+        }
+        if( isNaN(_move_x) ) {
+            _move_x = -1;
+        }
+        if( isNaN(_move_y) ) {
+            _move_y = -1;
         }
         client.getRemoteClient().setMoveDirection(_botNr, _move_x, _move_y);
     }
@@ -168,7 +175,7 @@ public class Bot {
         //check if fast bot, if so: prioritize white areas
         boolean fastBot = _radius==40;
         //SIZE AND WEIGHT OF HOT AREA RASTER DEFINED HERE!
-        RasterNode[] rasterNodes = board.getRaster(RASTER_SIZE_HOTAREA, 3, 0, fastBot );
+        RasterNode[] rasterNodes = board.getRaster(RASTER_SIZE_HOTAREA, 3, 0, fastBot, false);
 
         //get hottest area
         RasterNode rasterNode = board.getHotArea(rasterNodes, this);
@@ -190,7 +197,7 @@ public class Bot {
         else
         if( fastBot ) {
             //Djikstra move to target
-            RasterNode[] all_nodes = board.getRaster(RASTER_SIZE_DIJKSTRA, 9, 1000000, fastBot);
+            RasterNode[] all_nodes = board.getRaster(RASTER_SIZE_DIJKSTRA, 25, 1000000, fastBot, true);
             RasterNode.addAdjacencyLists(all_nodes);
 
             int me = board.getRasterID(_pos._x, _pos._y, RASTER_SIZE_DIJKSTRA);
