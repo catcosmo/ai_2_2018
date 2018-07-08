@@ -6,17 +6,17 @@ public class RasterNode {
     private int _startY;
     private int _size;
     private int _numberID;
-    private int _weight;
-    private int _leveledNeighbourhoodWeight;
+    private long _weight;
+    private long _leveledNeighbourhoodWeight;
 
 
     private List<RasterNode> _shortestPath = new LinkedList<>();
 
-    private Integer _distance = Integer.MAX_VALUE;
+    private Long _distance = Long.MAX_VALUE;
 
-    Map<RasterNode, Integer> _adjacentRasterNodes = new HashMap<>();
+    Map<RasterNode, Long> _adjacentRasterNodes = new HashMap<>();
 
-    public void _addDestination(RasterNode destination, int distance) {
+    public void _addDestination(RasterNode destination, long distance) {
         _adjacentRasterNodes.put(destination, distance);
     }
 
@@ -58,7 +58,7 @@ public class RasterNode {
     }
 
 
-    public RasterNode(int _startX, int _startY, int _size, int _numberID, int _weight) {
+    public RasterNode(int _startX, int _startY, int _size, int _numberID, long _weight) {
         this._startX = _startX;
         this._startY = _startY;
         this._size = _size;
@@ -100,11 +100,11 @@ public class RasterNode {
         this._numberID = _numberID;
     }
 
-    public int get_weight() {
+    public long get_weight() {
         return _weight;
     }
 
-    public void set_weight(int _weight) {
+    public void set_weight(long _weight) {
         this._weight = _weight;
     }
 
@@ -116,27 +116,27 @@ public class RasterNode {
         this._shortestPath = _shortestPath;
     }
 
-    public Integer get_distance() {
+    public Long get_distance() {
         return _distance;
     }
 
-    public void set_distance(Integer _distance) {
+    public void set_distance(Long _distance) {
         this._distance = _distance;
     }
 
-    public Map<RasterNode, Integer> get_adjacentRasterNodes() {
+    public Map<RasterNode, Long> get_adjacentRasterNodes() {
         return _adjacentRasterNodes;
     }
 
-    public void set_adjacentRasterNodes(Map<RasterNode, Integer> _adjacentRasterNodes) {
+    public void set_adjacentRasterNodes(Map<RasterNode, Long> _adjacentRasterNodes) {
         this._adjacentRasterNodes = _adjacentRasterNodes;
     }
 
-    public int get_leveledNeighbourhoodWeight() {
+    public long get_leveledNeighbourhoodWeight() {
         return _leveledNeighbourhoodWeight;
     }
 
-    public void set_leveledNeighbourhoodWeight(int _leveledNeighbourhoodWeight) {
+    public void set_leveledNeighbourhoodWeight(long _leveledNeighbourhoodWeight) {
         this._leveledNeighbourhoodWeight = _leveledNeighbourhoodWeight;
     }
 
