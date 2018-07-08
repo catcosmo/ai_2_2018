@@ -9,7 +9,7 @@ public class Graph {
 
     public static void calculateShortestPathFromSource(RasterNode[] rasterNodes, RasterNode source) {
         fillGraph(rasterNodes);
-        source.set_distance(0);
+        source.set_distance((long)0);
 
         Set<RasterNode> settledRasterNodes = new HashSet<>();
         Set<RasterNode> unsettledRasterNodes = new HashSet<>();
@@ -19,10 +19,10 @@ public class Graph {
         while (unsettledRasterNodes.size() != 0) {
             RasterNode currentRasterNode = getLowestDistanceRasterNode(unsettledRasterNodes);
             unsettledRasterNodes.remove(currentRasterNode);
-            for (Map.Entry< RasterNode, Integer> adjacencyPair:
+            for (Map.Entry< RasterNode, Long> adjacencyPair:
                     currentRasterNode.get_adjacentRasterNodes().entrySet()) {
                 RasterNode adjacentRasterNode = adjacencyPair.getKey();
-                Integer edgeWeight = adjacencyPair.getValue();
+                Long edgeWeight = adjacencyPair.getValue();
                 //edgeWeight *= -1;
                 if (!settledRasterNodes.contains(adjacentRasterNode)) {
                     calculateMinimumDistance(adjacentRasterNode, edgeWeight, currentRasterNode);
@@ -46,9 +46,9 @@ public class Graph {
 
     private static RasterNode getLowestDistanceRasterNode(Set < RasterNode > unsettledRasterNodes) {
         RasterNode lowestDistanceRasterNode = null;
-        int lowestDistance = Integer.MAX_VALUE;
+        long lowestDistance = Integer.MAX_VALUE;
         for (RasterNode rasterNode: unsettledRasterNodes) {
-            int rasterNodeDistance = rasterNode.get_distance();
+            long rasterNodeDistance = rasterNode.get_distance();
             if (rasterNodeDistance < lowestDistance) {
                 lowestDistance = rasterNodeDistance;
                 lowestDistanceRasterNode = rasterNode;
@@ -58,8 +58,8 @@ public class Graph {
     }
 
     private static void calculateMinimumDistance(RasterNode evaluationRasterNode,
-                                                 Integer edgeWeigh, RasterNode sourceRasterNode) {
-        Integer sourceDistance = sourceRasterNode.get_distance();
+                                                 Long edgeWeigh, RasterNode sourceRasterNode) {
+        Long sourceDistance = sourceRasterNode.get_distance();
         if (sourceDistance + edgeWeigh < evaluationRasterNode.get_distance()) {
             evaluationRasterNode.set_distance(sourceDistance + edgeWeigh);
             LinkedList<RasterNode> shortestPath = new LinkedList<>(sourceRasterNode.get_shortestPath());

@@ -97,7 +97,7 @@ public class Bot {
     private void checkDidNotMove() {
         if( _did_not_move ) {
             _did_not_move = false;
-            log("::checkDidNotMove() reset flag");
+            // log("::checkDidNotMove() reset flag");
             return;
         }
         int diffX = abs(_old_pos._x - _pos._x);
@@ -272,7 +272,7 @@ public class Bot {
             log("::isPathClear() NOK to:"+goalX +"," + goalY + " with steps:" +steps);
             return false;
         }
-        log("::isPathClear() OK to:"+goalX +"," + goalY + " with steps:" +steps);
+        //log("::isPathClear() OK to:"+goalX +"," + goalY + " with steps:" +steps);
         return true;
     }
 
