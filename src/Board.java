@@ -179,7 +179,7 @@ public class Board implements Cloneable {
         else yID = y/rasterSize +1;
 
         //add xPos & yPos to calculate field
-        rasterID = xID + ((yID-1)*axisRasterNo);
+        rasterID = xID + ((yID-1)*axisRasterNo)-1;
         return rasterID;
     }
 
