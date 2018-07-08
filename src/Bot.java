@@ -71,14 +71,15 @@ public class Bot {
         else
             {
             // give it a direction
-//            if( !moveToNearestPU(powerUps, board) ) {
-                moveToHottestArea(board);
-//            }
+            //if( !moveToNearestPU(powerUps, board)) {
+                //moveToHottestArea(board);
+            //}
+
+            paintAreaNew(board);
 
             // turn on next collision
             // whatever way we are
             // and paint area
-            paintAreaNew(board);
 
             // NOT NEEDED ANYMORE?
 //            // safety collision check
@@ -457,7 +458,7 @@ public class Bot {
          }
         //walk 2 * your own radius
         //turn 90° right
-         else if(_startAreaTurnY != 0 && _startAreaTurnX != 0 && distance > _radius*2){
+         else if(_startAreaTurnY != 0 && _startAreaTurnX != 0 && distance > _radius*3){
             float[] moveVector = calcNewDirVector(angle);
             //turn 90° right
             move_x = moveVector[0];
@@ -466,6 +467,7 @@ public class Bot {
             _startAreaTurnY = 0;
             //repeat with 90° left
             _turnsRight = !_turnsRight;
+            System.out.println("turn!");
         }
 
 
