@@ -40,7 +40,7 @@ public class PowerUps {
     public PowerUp findNearest(Bot bot) {
         PowerUp best = null;
         long best_diff = 9999999;
-        log("findNearest() TRY for bot@"+ bot._pos._x +"," + bot._pos._y);
+        // log("findNearest() TRY for bot@"+ bot._pos._x +"," + bot._pos._y);
         for (Iterator<PowerUp> iterator = _powerups.iterator(); iterator.hasNext(); ) {
             PowerUp next = iterator.next();
             if( next._type != SLOW ) {
