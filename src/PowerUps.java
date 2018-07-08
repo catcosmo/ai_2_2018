@@ -4,6 +4,9 @@ import lenz.htw.zpifub.Update;
 import java.util.HashSet;
 import java.util.Iterator;
 
+import static java.lang.Math.abs;
+import static java.lang.Math.round;
+import static java.lang.Math.sqrt;
 import static lenz.htw.zpifub.PowerupType.SLOW;
 
 public class PowerUps {
@@ -36,12 +39,17 @@ public class PowerUps {
 
     public PowerUp findNearest(Bot bot) {
         PowerUp best = null;
-        int best_diff = 9999999;
+        long best_diff = 9999999;
         log("findNearest() TRY for bot@"+ bot._pos._x +"," + bot._pos._y);
         for (Iterator<PowerUp> iterator = _powerups.iterator(); iterator.hasNext(); ) {
             PowerUp next = iterator.next();
             if( next._type != SLOW ) {
-                int diff = (bot._pos._x-next._x)+(bot._pos._y-next._y);
+                long diff = 9999999;
+                int a2= abs(bot._pos._x-next._x);
+                a2 *= a2;
+                int b2= abs(bot._pos._y-next._y);
+                b2 *= b2;
+                diff = round(sqrt(a2+b2));
                 if( diff < best_diff ) {
                     boolean clearPath = bot.isPathClear(next._x, next._y, _board);
                     if (clearPath) {
