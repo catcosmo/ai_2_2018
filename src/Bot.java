@@ -18,8 +18,9 @@ public class Bot {
     public Field _pos;
     public int _radius;
     public int _counter = 0;
-    private int startAreaTurnX = 0;
-    private int startAreaTurnY = 0;
+    public boolean _turnsRight = true;
+    private int _startAreaTurnX = 0;
+    private int _startAreaTurnY = 0;
     private double _away_angle=0.0;
     private Field _old_pos;
     private int _old_cycle=0;
@@ -77,7 +78,7 @@ public class Bot {
             // turn on next collision
             // whatever way we are
             // and paint area
-            // paintArea(board);
+            paintAreaNew(board);
 
             // NOT NEEDED ANYMORE?
 //            // safety collision check
@@ -376,7 +377,7 @@ public class Bot {
 
         float move_x = 0.0f;
         float move_y = 0.0f;
-        double angle = 45;
+        double angle = 90;
 
         if( collDetect(board,_move_x,_move_y) ) {
             float[] moveVector = calcNewDirVector(angle);
@@ -389,25 +390,25 @@ public class Bot {
                 move_x = _move_x + (moveVector[0]) % 1;
                 move_y = _move_x + (moveVector[1]) % 1;
             }
-            startAreaTurnX = _pos._x;
-            startAreaTurnY = _pos._y;
+            _startAreaTurnX = _pos._x;
+            _startAreaTurnX = _pos._y;
         }
         else
-        if( (startAreaTurnY != 0.0f || startAreaTurnX != 0.0f ) &&
-            abs(startAreaTurnX-_pos._x) +abs(startAreaTurnY-_pos._y)>2*_radius ) {
+        if( (_startAreaTurnY != 0.0f || _startAreaTurnX != 0.0f ) &&
+            abs(_startAreaTurnX-_pos._x) +abs(_startAreaTurnY-_pos._y)>2*_radius ) {
             //log("::paintArea() -> 2x bot._radius drawn - Turn!");
             float[] moveVector = calcNewDirVector(angle);
             move_x = _move_x + (moveVector[0]) % 1;
             move_y = _move_x + (moveVector[1]) % 1;
             if( collDetect(board,move_x,move_y)) {
                 //log("::paintArea() -> 2x bot._radius drawn - Turn! Coll on new dir! -> turnaround");
-                angle *= -1;
+                angle +=180;
                 moveVector = calcNewDirVector(angle);
                 move_x = (moveVector[0]) % 1;
                 move_y = (moveVector[1]) % 1;
             }
-            startAreaTurnX = 0;
-            startAreaTurnY = 0;
+            _startAreaTurnX = 0;
+            _startAreaTurnY = 0;
         }
 
         // startest? -> merke startcoord als member und laufe rechts
@@ -430,25 +431,59 @@ public class Bot {
 
         float move_x = 0.0f;
         float move_y = 0.0f;
+        int angle = 90;
+        //calculate distance since turn
+        long distance = 0;
+        int a2= abs(_pos._x-_startAreaTurnX);
+        a2 *= a2;
+        int b2= abs(_pos._y-_startAreaTurnX);
+        b2 *= b2;
+        distance = round(sqrt(a2+b2));
+
+        if(!_turnsRight)
+            angle*=-1;
+
+
         //walk in one direction
         //until you hit obstacle
-        if(collDetect(board, 0, 0)){
+        if (collDetect(board, _move_x, _move_y)) {
+            float[] moveVector = calcNewDirVector(angle);
+            //turn 90° right
+            move_x = moveVector[0];
+            move_y = moveVector[1];
+            _startAreaTurnX = _pos._x;
+            _startAreaTurnY = _pos._y;
 
-        }
-        //turn 90° right
+         }
         //walk 2 * your own radius
         //turn 90° right
-        //repeat with 90° left
-        return true;
+         else if(_startAreaTurnY != 0 && _startAreaTurnX != 0 && distance > _radius*2){
+            float[] moveVector = calcNewDirVector(angle);
+            //turn 90° right
+            move_x = moveVector[0];
+            move_y = moveVector[1];
+            _startAreaTurnX = 0;
+            _startAreaTurnY = 0;
+            //repeat with 90° left
+            _turnsRight = !_turnsRight;
+        }
+
+
+        if( move_x!=0.0f || move_y!=0.0f) {
+            _move_x=move_x;
+            _move_y=move_y;
+            return true;
+        }
+        return false;
     }
 
     //calculate new x/y coordinates for movement direction, input angle in which to change
     private float[] calcNewDirVector(double angle){
         float[] vector = new float[2];
-        double x = _pos._x;
-        double y = _pos._y;
+        double x = _move_x;
+        double y = _move_y;
 
-        double radians = angle;// Math.toRadians(angle);
+        double radians = Math.toRadians(angle);
         double cos = Math.cos(radians);
         double sin = Math.sin(radians);
         double xNew = (x * cos) - (y * sin);
@@ -463,6 +498,8 @@ public class Bot {
         double angle = 0.0;
         double a = abs( _pos._y - field._y);
         double b = abs( _pos._x - field._x);
+        if(a == 0)
+            a = 0.1;
         angle = Math.atan( b/a );
         return angle;
     }

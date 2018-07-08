@@ -259,6 +259,7 @@ public class Board implements Cloneable {
         long rTemp;
         long gTemp;
         long bTemp;
+        int whiteCarry =0;
 
         // go through rasterNode pixel by pixel
         for (int y = startY; y < startY + rasterSize; y++) {
@@ -278,48 +279,57 @@ public class Board implements Cloneable {
                 }
                 //sum up color values for the other colors
                 else {
-                    //odont add value for fields in own color (more than 125 of own color)
+                    //dont add value for fields in own color (more than 125 of own color)
                     switch (_client.getRemoteClient().getMyPlayerNumber()) {
                         case 0:
-                            r += rTemp;
-//                            if(!findWhiteSpace) {
-//                                b += bTemp * weightFactor;
-//                                g += gTemp * weightFactor;
-//                            } else
-//                                {
-                                b += bTemp;
-                                g += gTemp;
-//                            }
+                            if(rTemp>125)
+                                r += rTemp*1000;
+                            else
+                                whiteCarry = 255 - rTemp;
+                            if(!findWhiteSpace) {
+                                b += bTemp * weightFactor*-1;
+                                g += gTemp * weightFactor*-1;
+                            } else{
+                                b += bTemp*-1;
+                                g += gTemp*-1;
+                            }
                             break;
                         case 1:
-                                g += gTemp;
-//                            if(!findWhiteSpace) {
-//                                b += bTemp * weightFactor;
-//                                r += rTemp * weightFactor;
-//                            } else {
-                                b += bTemp;
-                                r += rTemp;
-//                            }
+                            if(gTemp>125)
+                                g += gTemp*1000;
+                            else
+                                whiteCarry = 255 - gTemp;
+                            if(!findWhiteSpace) {
+                                b += bTemp * weightFactor*-1;
+                                r += rTemp * weightFactor*-1;
+                            } else{
+                                b += bTemp*-1;
+                                r += rTemp*-1;
+                            }
                             break;
                         case 2:
-                                b += bTemp;
-//                            if(!findWhiteSpace) {
-//                                r += rTemp * weightFactor;
-//                                g += gTemp * weightFactor;
-//                            } else{
-                                r += rTemp;
-                                g += gTemp;
-//                            }
+                            if(bTemp>125)
+                                r += bTemp*1000;
+                            else
+                                whiteCarry = 255 - bTemp;
+                            if(!findWhiteSpace) {
+                                r += rTemp * weightFactor*-1;
+                                g += gTemp * weightFactor*-1;
+                            } else{
+                                r += rTemp*-1;
+                                g += gTemp*-1;
+                            }
                             break;
                     }
                 }
             }
         }
         //current weighting: white is more important than colors, black doesnt give negative values
+        // if white is prioritized: weight white higher
         if(findWhiteSpace) {
-            w=w/weightFactor;
+            w=(w*weightFactor)+(whiteCarry*weightFactor)*-1;
         }
-        s = s*avoidBlackFactor;
+        s = s*avoidBlackFactor*1;
         weight = r+g+b+w+s;
         return weight;
     }
