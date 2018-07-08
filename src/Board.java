@@ -61,7 +61,7 @@ public class Board implements Cloneable {
             _board[update.x][update.y]._hasPU = false;
             // clean up CLOCK barrier
             if(_board[update.x][update.y]._tempBlock){
-                // System.out.println("TempBlockRemove x:"+update.x+"y:"+update.y);
+                System.out.println("TempBlockRemove x:"+update.x+"y:"+update.y);
 
                 for (int x = update.x-20; x <= update.x+20 ; x++) {
                     for (int y = update.y - 20; y <= update.y + 20; y++) {
@@ -89,7 +89,7 @@ public class Board implements Cloneable {
 
 
     //calculate hot area for bot
-    public RasterNode getHotArea(RasterNode[] rasterNodes, Bot bot){
+    public RasterNode getHotArea(RasterNode[] rasterNodes, Bot bot, boolean includeNeighbours){
         if( bot._pos==null )
             return rasterNodes[0];
 
@@ -97,6 +97,7 @@ public class Board implements Cloneable {
         int best = 0;
         int hottestArea = 1;
         int closest = 0;
+
         for (int i = 0; i < rasterNodes.length; i++) {
             //if brush is slow, check nearer neighbourhood only
             //spraycan gets the whole field to play in
@@ -112,19 +113,38 @@ public class Board implements Cloneable {
                             || (bot._pos._y-rasterNodes[i].get_startY())>400)){
                 continue;
             }
-            if(rasterNodes[i].get_weight()>best) {
-                best = rasterNodes[i].get_weight();
-                closest = (bot._pos._x-rasterNodes[i].get_startX())+(bot._pos._y-rasterNodes[i].get_startY());
-                hottestArea = i;
-
-            }
-            //get NEAREST hottest field: if rasterNode is equally good, take the closer one
-            else if (rasterNodes[i].get_weight()==best){
-                if(closest > (bot._pos._x-rasterNodes[i].get_startX())+(bot._pos._y-rasterNodes[i].get_startY())){
+            if(!includeNeighbours) {
+                if (rasterNodes[i].get_weight() > best) {
                     best = rasterNodes[i].get_weight();
-                    closest = (bot._pos._x-rasterNodes[i].get_startX())+(bot._pos._y-rasterNodes[i].get_startY());
+                    closest = (bot._pos._x - rasterNodes[i].get_startX()) + (bot._pos._y - rasterNodes[i].get_startY());
                     hottestArea = i;
+
                 }
+                //get NEAREST hottest field: if rasterNode is equally good, take the closer one
+                else if (rasterNodes[i].get_weight() == best) {
+                    if (closest > (bot._pos._x - rasterNodes[i].get_startX()) + (bot._pos._y - rasterNodes[i].get_startY())) {
+                        best = rasterNodes[i].get_weight();
+                        closest = (bot._pos._x - rasterNodes[i].get_startX()) + (bot._pos._y - rasterNodes[i].get_startY());
+                        hottestArea = i;
+                    }
+                }
+            }
+            else{
+                if (rasterNodes[i].get_leveledNeighbourhoodWeight() > best) {
+                    best = rasterNodes[i].get_leveledNeighbourhoodWeight();
+                    closest = (bot._pos._x - rasterNodes[i].get_startX()) + (bot._pos._y - rasterNodes[i].get_startY());
+                    hottestArea = i;
+
+                }
+                //get NEAREST hottest field: if rasterNode is equally good, take the closer one
+                else if (rasterNodes[i].get_leveledNeighbourhoodWeight() == best) {
+                    if (closest > (bot._pos._x - rasterNodes[i].get_startX()) + (bot._pos._y - rasterNodes[i].get_startY())) {
+                        best = rasterNodes[i].get_leveledNeighbourhoodWeight();
+                        closest = (bot._pos._x - rasterNodes[i].get_startX()) + (bot._pos._y - rasterNodes[i].get_startY());
+                        hottestArea = i;
+                    }
+                }
+
             }
         }
         return rasterNodes[hottestArea];
@@ -170,6 +190,7 @@ public class Board implements Cloneable {
                 counter+=1;
             }
         }
+        RasterNode.addAdjacencyLists(rasterNodes);
         return rasterNodes;
     }
 
