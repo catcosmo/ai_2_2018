@@ -269,41 +269,41 @@ public class Board implements Cloneable {
                     switch (_client.getRemoteClient().getMyPlayerNumber()) {
                         case 0:
                             if(rTemp>125)
-                                r += rTemp*1000*-1;
+                                r += rTemp*1000;
                             else
                                 whiteCarry = 255 - rTemp;
                             if(!findWhiteSpace) {
-                                b += bTemp * weightFactor;
-                                g += gTemp * weightFactor;
+                                b += bTemp * weightFactor*-1;
+                                g += gTemp * weightFactor*-1;
                             } else{
-                                b += bTemp;
-                                g += gTemp;
+                                b += bTemp*-1;
+                                g += gTemp*-1;
                             }
                             break;
                         case 1:
                             if(gTemp>125)
-                                g += gTemp*1000*-1;
+                                g += gTemp*1000;
                             else
                                 whiteCarry = 255 - gTemp;
                             if(!findWhiteSpace) {
-                                b += bTemp * weightFactor;
-                                r += rTemp * weightFactor;
+                                b += bTemp * weightFactor*-1;
+                                r += rTemp * weightFactor*-1;
                             } else{
-                                b += bTemp;
-                                r += rTemp;
+                                b += bTemp*-1;
+                                r += rTemp*-1;
                             }
                             break;
                         case 2:
                             if(bTemp>125)
-                                r += bTemp*1000*-1;
+                                r += bTemp*1000;
                             else
                                 whiteCarry = 255 - bTemp;
                             if(!findWhiteSpace) {
-                                r += rTemp * weightFactor;
-                                g += gTemp * weightFactor;
+                                r += rTemp * weightFactor*-1;
+                                g += gTemp * weightFactor*-1;
                             } else{
-                                r += rTemp;
-                                g += gTemp;
+                                r += rTemp*-1;
+                                g += gTemp*-1;
                             }
                             break;
                     }
@@ -313,9 +313,9 @@ public class Board implements Cloneable {
         //current weighting: white is more important than colors, black doesnt give negative values
         // if white is prioritized: weight white higher
         if(findWhiteSpace) {
-            w=(w*weightFactor)+(whiteCarry*weightFactor);
+            w=(w*weightFactor)+(whiteCarry*weightFactor)*-1;
         }
-        s = s*avoidBlackFactor*-1;
+        s = s*avoidBlackFactor*1;
         weight = r+g+b+w+s;
         return weight;
     }
