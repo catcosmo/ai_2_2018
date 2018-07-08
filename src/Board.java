@@ -119,8 +119,8 @@ public class Board implements Cloneable {
             //spraycan gets the whole field to play in
             //small brush
             if(botRadius == 15 &&
-                    (abs(bot._pos._x-rasterNodes[i].get_startX())>512
-                        || abs(bot._pos._y-rasterNodes[i].get_startY())>512)){
+                    (abs(bot._pos._x-rasterNodes[i].get_startX())>550
+                        || abs(bot._pos._y-rasterNodes[i].get_startY())>550)){
                 continue;
             }
             //wide brush
@@ -288,7 +288,7 @@ public class Board implements Cloneable {
                     switch (_client.getRemoteClient().getMyPlayerNumber()) {
                         case 0:
                             if(rTemp>125)
-                                r += rTemp*1000;
+                                r += rTemp*5000;
                             else
                                 whiteCarry = 255 - rTemp;
                             if(!findWhiteSpace) {
@@ -301,7 +301,7 @@ public class Board implements Cloneable {
                             break;
                         case 1:
                             if(gTemp>125)
-                                g += gTemp*1000;
+                                g += gTemp*5000;
                             else
                                 whiteCarry = 255 - gTemp;
                             if(!findWhiteSpace) {
@@ -314,7 +314,7 @@ public class Board implements Cloneable {
                             break;
                         case 2:
                             if(bTemp>125)
-                                r += bTemp*1000;
+                                r += bTemp*5000;
                             else
                                 whiteCarry = 255 - bTemp;
                             if(!findWhiteSpace) {
