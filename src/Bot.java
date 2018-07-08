@@ -178,7 +178,7 @@ public class Bot {
         RasterNode[] rasterNodes = board.getRaster(RASTER_SIZE_HOTAREA, 3, 0, fastBot, false);
 
         //get hottest area
-        RasterNode rasterNode = board.getHotArea(rasterNodes, this);
+        RasterNode rasterNode = board.getHotArea(rasterNodes, this, true);
         if( _hottest_area!=null && _hottest_area.get_numberID()==rasterNode.get_numberID() ) {
 
         } else {
@@ -198,7 +198,6 @@ public class Bot {
         if( fastBot ) {
             //Djikstra move to target
             RasterNode[] all_nodes = board.getRaster(RASTER_SIZE_DIJKSTRA, 25, 1000000, fastBot, true);
-            RasterNode.addAdjacencyLists(all_nodes);
 
             int me = board.getRasterID(_pos._x, _pos._y, RASTER_SIZE_DIJKSTRA);
             RasterNode my_node = all_nodes[me-1];

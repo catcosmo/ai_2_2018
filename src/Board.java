@@ -180,10 +180,7 @@ public class Board implements Cloneable {
         for (int y = 0; y < 1024; y+=rasterSize) {
             for (int x = 0; x < 1024; x+=rasterSize) {
                 int weight = 0;
-                if( walkable )
-                    weight = calcWalkableRasterWeight(x,y,rasterSize);
-                else
-                    weight = calcRasterWeight(x, y, rasterSize, weightFactor, avoidBlackFactor, false);
+                weight = calcRasterWeight(x, y, rasterSize, weightFactor, avoidBlackFactor, false);
                 //System.out.println("Weight for Raster:" + counter + " is:" + weight);
                 RasterNode rasterNode = new RasterNode(x, y, rasterSize, counter, weight);
                 rasterNodes[counter] = rasterNode;
@@ -270,8 +267,7 @@ public class Board implements Cloneable {
                     //odont add value for fields in own color (more than 125 of own color)
                     switch (_client.getRemoteClient().getMyPlayerNumber()) {
                         case 0:
-                            if(rTemp <= 125)
-                                r += rTemp;
+                            r += rTemp*1000*-1;
                             if(!findWhiteSpace) {
                                 b += bTemp * weightFactor;
                                 g += gTemp * weightFactor;
@@ -281,8 +277,7 @@ public class Board implements Cloneable {
                             }
                             break;
                         case 1:
-                            if(gTemp <= 125)
-                                g += gTemp;
+                                g += gTemp*1000*-1;
                             if(!findWhiteSpace) {
                                 b += bTemp * weightFactor;
                                 r += rTemp * weightFactor;
@@ -292,8 +287,7 @@ public class Board implements Cloneable {
                             }
                             break;
                         case 2:
-                            if(bTemp <= 125)
-                                b += bTemp;
+                                b += bTemp*1000*-1;
                             if(!findWhiteSpace) {
                                 r += rTemp * weightFactor;
                                 g += gTemp * weightFactor;
