@@ -206,14 +206,13 @@ public class Board implements Cloneable {
         return rasterNodes;
     }
 
-    private int calcWalkableRasterWeight(int startX, int startY, int rasterSize) {
+    private long calcWalkableRasterWeight(int startX, int startY, int rasterSize) {
         // go through rasterNode pixel by pixel
-        int weight = 0;
+        long weight = 0;
         boolean has_non_walkable=false;
         boolean has_my_color = false;
         for (int y = startY; y < startY + rasterSize; y++) {
             for (int x = startX; x < startX + rasterSize; x++) {
-
                 if( !_board[x][y]._isWalkable ) {
                     has_non_walkable=true;
                 } else {
@@ -232,15 +231,15 @@ public class Board implements Cloneable {
 //                    } else if (plNo == 2 && bTemp >= 125) {
 //                        has_my_color = true;
 //                    }
-                    weight += 100;
+                    weight += 1;
                 }
             }
         }
         if(  has_my_color  ) {
-            weight = 10;
+            weight = 9999;
         }
         if( has_non_walkable ) {
-            weight=1;
+            weight=99999;
         }
         return weight;
     }
@@ -282,34 +281,35 @@ public class Board implements Cloneable {
                     //odont add value for fields in own color (more than 125 of own color)
                     switch (_client.getRemoteClient().getMyPlayerNumber()) {
                         case 0:
-                            r += rTemp*1000*-1;
-                            if(!findWhiteSpace) {
-                                b += bTemp * weightFactor;
-                                g += gTemp * weightFactor;
-                            } else{
+                            r += rTemp;
+//                            if(!findWhiteSpace) {
+//                                b += bTemp * weightFactor;
+//                                g += gTemp * weightFactor;
+//                            } else
+//                                {
                                 b += bTemp;
                                 g += gTemp;
-                            }
+//                            }
                             break;
                         case 1:
-                                g += gTemp*1000*-1;
-                            if(!findWhiteSpace) {
-                                b += bTemp * weightFactor;
-                                r += rTemp * weightFactor;
-                            } else{
+                                g += gTemp;
+//                            if(!findWhiteSpace) {
+//                                b += bTemp * weightFactor;
+//                                r += rTemp * weightFactor;
+//                            } else {
                                 b += bTemp;
                                 r += rTemp;
-                            }
+//                            }
                             break;
                         case 2:
-                                b += bTemp*1000*-1;
-                            if(!findWhiteSpace) {
-                                r += rTemp * weightFactor;
-                                g += gTemp * weightFactor;
-                            } else{
+                                b += bTemp;
+//                            if(!findWhiteSpace) {
+//                                r += rTemp * weightFactor;
+//                                g += gTemp * weightFactor;
+//                            } else{
                                 r += rTemp;
                                 g += gTemp;
-                            }
+//                            }
                             break;
                     }
                 }
@@ -317,9 +317,9 @@ public class Board implements Cloneable {
         }
         //current weighting: white is more important than colors, black doesnt give negative values
         if(findWhiteSpace) {
-            w=w*weightFactor;
+            w=w/weightFactor;
         }
-        s = s*avoidBlackFactor*-1;
+        s = s*avoidBlackFactor;
         weight = r+g+b+w+s;
         return weight;
     }

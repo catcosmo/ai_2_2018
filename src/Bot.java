@@ -8,9 +8,9 @@ import static java.lang.Math.round;
 import static java.lang.Math.sqrt;
 
 public class Bot {
-    private static final boolean _use_dijkstra = false;
+    private static final boolean _use_dijkstra = true;
     public static final int RASTER_SIZE_HOTAREA=128;
-    public static final int RASTER_SIZE_DIJKSTRA=32;
+    public static final int RASTER_SIZE_DIJKSTRA=16;
 
     public int _botNr;
     public float _move_x;
@@ -207,28 +207,28 @@ public class Bot {
         else
         if( fastBot ) {
             //Djikstra move to target
-            RasterNode[] all_nodes = board.getRaster(RASTER_SIZE_DIJKSTRA, 25, 1000000, fastBot, true);
+            RasterNode[] all_nodes = board.getRaster(RASTER_SIZE_DIJKSTRA, 3, 10000, fastBot, false);
 
             int me = board.getRasterID(_pos._x, _pos._y, RASTER_SIZE_DIJKSTRA);
-            RasterNode my_node = all_nodes[me-1];
+            RasterNode my_node = all_nodes[me];
             Graph.calculateShortestPathFromSource(all_nodes, my_node);
             int tar = board.getRasterID(fieldCenterX, fieldCenterY, RASTER_SIZE_DIJKSTRA);
-            RasterNode target = all_nodes[tar-1];
+            RasterNode target = all_nodes[tar];
             _my_way = target.get_shortestPath();
-            if (_my_way.size() == 0) {
+            if (_my_way.size() <= 1) {
                 log(" djisktra empty!");
             } else {
                 log(" djisktra OK! to:"+ fieldCenterX+","+ fieldCenterY+" waypts:" + _my_way.size());
-                RasterNode firstNode = _my_way.get(0);
-                fieldCenterX = firstNode.get_startX() + firstNode.get_size() / 2;
-                fieldCenterY = firstNode.get_startY() + firstNode.get_size() / 2;
+                RasterNode firstNode = _my_way.get(1);
+                fieldCenterX = firstNode.get_middleX();
+                fieldCenterY = firstNode.get_middleY();
                 board.saveBoard(_my_way);
             }
         }
 
-        if (!isPathClear(fieldCenterX, fieldCenterY, board)) {
-            return false;
-        }
+//        if (!isPathClear(fieldCenterX, fieldCenterY, board)) {
+//            return false;
+//        }
 
         float[] dir = getDirection(fieldCenterX, fieldCenterY);
         move_x = dir[0];
