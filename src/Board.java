@@ -95,7 +95,7 @@ public class Board implements Cloneable {
             return rasterNodes[0];
 
         long botRadius = bot._radius;
-        long best = 0;
+        long best = Long.MAX_LONG;
         int hottestArea = 1;
         long closest = 0;
         int bots_area_id = Board.getRasterID(bot._pos._x, bot._pos._y, Bot.RASTER_SIZE_HOTAREA) ;
@@ -125,33 +125,33 @@ public class Board implements Cloneable {
                 continue;
             }
             if(!includeNeighbours) {
-                if (rasterNodes[i].get_weight() > best) {
+                if (rasterNodes[i].get_weight() < best) {
                     best = rasterNodes[i].get_weight();
-                    closest = (bot._pos._x - rasterNodes[i].get_startX()) + (bot._pos._y - rasterNodes[i].get_startY());
+                    closest = abs(bot._pos._x - rasterNodes[i].get_startX()) + abs(bot._pos._y - rasterNodes[i].get_startY());
                     hottestArea = i;
 
                 }
                 //get NEAREST hottest field: if rasterNode is equally good, take the closer one
                 else if (rasterNodes[i].get_weight() == best) {
-                    if (closest > (bot._pos._x - rasterNodes[i].get_startX()) + (bot._pos._y - rasterNodes[i].get_startY())) {
+                    if (closest > abs(bot._pos._x - rasterNodes[i].get_startX()) + abs(bot._pos._y - rasterNodes[i].get_startY())) {
                         best = rasterNodes[i].get_weight();
-                        closest = (bot._pos._x - rasterNodes[i].get_startX()) + (bot._pos._y - rasterNodes[i].get_startY());
+                        closest = abs(bot._pos._x - rasterNodes[i].get_startX()) + abs(bot._pos._y - rasterNodes[i].get_startY());
                         hottestArea = i;
                     }
                 }
             }
             else{
-                if (rasterNodes[i].get_leveledNeighbourhoodWeight() > best) {
+                if (rasterNodes[i].get_leveledNeighbourhoodWeight() < best) {
                     best = rasterNodes[i].get_leveledNeighbourhoodWeight();
-                    closest = (bot._pos._x - rasterNodes[i].get_startX()) + (bot._pos._y - rasterNodes[i].get_startY());
+                    closest = abs(bot._pos._x - rasterNodes[i].get_startX()) + abs(bot._pos._y - rasterNodes[i].get_startY());
                     hottestArea = i;
 
                 }
                 //get NEAREST hottest field: if rasterNode is equally good, take the closer one
                 else if (rasterNodes[i].get_leveledNeighbourhoodWeight() == best) {
-                    if (closest > (bot._pos._x - rasterNodes[i].get_startX()) + (bot._pos._y - rasterNodes[i].get_startY())) {
+                    if (closest > abs(bot._pos._x - rasterNodes[i].get_startX()) + abs(bot._pos._y - rasterNodes[i].get_startY())) {
                         best = rasterNodes[i].get_leveledNeighbourhoodWeight();
-                        closest = (bot._pos._x - rasterNodes[i].get_startX()) + (bot._pos._y - rasterNodes[i].get_startY());
+                        closest = abs(bot._pos._x - rasterNodes[i].get_startX()) + abs(bot._pos._y - rasterNodes[i].get_startY());
                         hottestArea = i;
                     }
                 }
