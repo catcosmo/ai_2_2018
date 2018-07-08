@@ -61,11 +61,11 @@ public class Bot {
             _pos = board.getBotPos(_botNr);
         }
 
-//        if(  didNotMove() ) {
-//            _move_x = _move_x*-1;
-//            _move_y = _move_y*-1;
-//        }
-//        else
+        if(  didNotMove() ) {
+            _move_x = _move_x*-1;
+            _move_y = _move_y*-1;
+        }
+        else
             {
             // give it a direction
             if( !moveToNearestPU(powerUps, board) ) {
@@ -77,6 +77,7 @@ public class Bot {
             // and paint area
             // paintArea(board);
 
+            // NOT NEEDED ANYMORE?
 //            // safety collision check
 //            if (collDetect(board, _move_x, _move_y)) {
 //                _move_x = _move_x * -1;
