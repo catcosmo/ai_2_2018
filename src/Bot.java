@@ -75,13 +75,13 @@ public class Bot {
             // turn on next collision
             // whatever way we are
             // and paint area
-            paintArea(board);
+            // paintArea(board);
 
-            // safety collision check
-            if (collDetect(board, _move_x, _move_y)) {
-                _move_x = _move_x * -1;
-                _move_y = _move_y * -1;
-            }
+//            // safety collision check
+//            if (collDetect(board, _move_x, _move_y)) {
+//                _move_x = _move_x * -1;
+//                _move_y = _move_y * -1;
+//            }
         }
         if( isNaN(_move_x) ) {
             _move_x = -1;
@@ -260,10 +260,12 @@ public class Bot {
         float[] dir = getDirection(goalX, goalY);
         float move_x = dir[0];
         float move_y = dir[1];
-        int steps = 17;
-        double a2= abs(_pos._x-goalX)^2;
-        double b2= abs(_pos._y-goalY)^2;
-        steps = (int) round(sqrt(a2+b2));
+        long steps = 0;
+        int a2= abs(_pos._x-goalX);
+        a2 *= a2;
+        int b2= abs(_pos._y-goalY);
+        b2 *= b2;
+        steps = round(sqrt(a2+b2));
         if( collDetect(board,move_x,move_y, steps) ) {
             log("::isPathClear() NOK to:"+goalX +"," + goalY + " with steps:" +steps);
             return false;
@@ -276,7 +278,7 @@ public class Bot {
         int steps=17;//_radius+1;
         return collDetect(board, intentedX, intendedY, steps);
     }
-    private boolean collDetect(Board board, float intendedX, float intendedY, int steps){
+    private boolean collDetect(Board board, float intendedX, float intendedY, long steps){
         if( _pos == null )
             return false;
 
@@ -332,13 +334,13 @@ public class Bot {
 //            }
         }
 
-        if( (_pos._x+steps>1023 && _move_x>0) ||
-            (_pos._x-steps<0 && _move_x<0) ||
-            (_pos._y+steps>1023 && _move_y>0) ||
-            (_pos._y-steps<0 && _move_y<0) ) {
-            log("::collDetect() -> BORDERFIELD");
-            return true;
-        }
+//        if( (_pos._x+steps>1023 && _move_x>0) ||
+//            (_pos._x-steps<0 && _move_x<0) ||
+//            (_pos._y+steps>1023 && _move_y>0) ||
+//            (_pos._y-steps<0 && _move_y<0) ) {
+//            log("::collDetect() -> BORDERFIELD");
+//            return true;
+//        }
 
         return false;
     }
