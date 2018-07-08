@@ -73,7 +73,7 @@ public class Client {
         board.initBoard();
         //RasterNode[] rasterNodes = board.getRaster(128);
 
-        PowerUps powerUps = new PowerUps();
+        PowerUps powerUps = new PowerUps(board);
 
         Bot bot0 = new Bot(0, 1, 0); // bot 0 nach rechts
         Bot bot1 = new Bot(1, 1, 0); // bot 1 nach rechts unten

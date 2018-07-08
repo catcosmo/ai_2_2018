@@ -4,6 +4,7 @@ import java.util.List;
 
 import static java.lang.Float.isNaN;
 import static java.lang.Math.abs;
+import static java.lang.Math.round;
 import static java.lang.Math.sqrt;
 
 public class Bot {
@@ -67,9 +68,9 @@ public class Bot {
 //        else
             {
             // give it a direction
-//            if( !moveToNearestPU(powerUps, board) ) {
-                moveToHottestArea(board);
-//            }
+            if( !moveToNearestPU(powerUps, board) ) {
+            //    moveToHottestArea(board);
+            }
 
             // turn on next collision
             // whatever way we are
@@ -145,17 +146,15 @@ public class Bot {
         float move_x = 0.0f;
         float move_y = 0.0f;
 
-        PowerUp nearestPU = powerUps.findNearest(_pos._x, _pos._y);
+        PowerUp nearestPU = powerUps.findNearest(this);
         if(nearestPU != null) {
-            int diffX = (_pos._x - nearestPU._x) * -1;
-            int diffY = (_pos._y - nearestPU._y) * -1;
-            float dist = (float) Math.sqrt((diffX * diffX) + (diffY * diffY));
-            move_x = (float) (diffX * (1.0 / dist));
-            move_y = (float) (diffY * (1.0 / dist));
-
-            if (!isPathClear(move_x, move_y, nearestPU._x, nearestPU._y, board)) {
-                return false;
-            }
+//            if (!isPathClear(nearestPU._x, nearestPU._y, board)) {
+//                log("::moveToNearestPU() can not find direct path!!!");
+//                return false;
+//            }
+            float[] dir = getDirection(nearestPU._x, nearestPU._y);
+            move_x = dir[0];
+            move_y = dir[1];
         }
         if( move_x!=0.0f || move_y!=0.0f) {
             _move_x = move_x;
@@ -211,21 +210,18 @@ public class Bot {
                 RasterNode firstNode = _my_way.get(0);
                 fieldCenterX = firstNode.get_startX() + firstNode.get_size() / 2;
                 fieldCenterY = firstNode.get_startY() + firstNode.get_size() / 2;
-                log(" djisktra OK! wp:" + _my_way.size() + " 1st:" + fieldCenterX + "," + fieldCenterY );
-                board.saveBoard(_my_way);
+                //log(" djisktra OK! wp:" + _my_way.size() + " 1st:" + fieldCenterX + "," + fieldCenterY );
+                //board.saveBoard(_my_way);
             }
         }
 
-        // calculate movement vector to FIRST node on way
-        int diffX = (_pos._x - fieldCenterX) * -1;
-        int diffY = (_pos._y - fieldCenterY) * -1;
-        float dist = (float) Math.sqrt((diffX * diffX) + (diffY * diffY));
-        move_x = (float) (diffX * (1.0 / dist));
-        move_y = (float) (diffY * (1.0 / dist));
-
-        if (!isPathClear(move_x, move_y, fieldCenterX, fieldCenterY, board)) {
+        if (!isPathClear(fieldCenterX, fieldCenterY, board)) {
             return false;
         }
+
+        float[] dir = getDirection(fieldCenterX, fieldCenterX);
+        move_x = dir[0];
+        move_y = dir[1];
 
         if (move_x != 0.0f || move_y != 0.0f) {
             _move_x = move_x;
@@ -236,55 +232,59 @@ public class Bot {
         return false;
     }
 
-    private boolean isPathClear(float move_x, float move_y, int goalX, int goalY, Board board) {
-        //starting position
-        Field temp = _pos;
-        Field next = null;
-        float newXPosf;
-        float newYPosf;
-        int newXPos;
-        int newYPos;
-        float tempCarryX = 0.0f; //Uebertrag von Runden
-        float tempCarryY = 0.0f;
-        // check all fields on the way until you reach destination
-        while (temp._isWalkable && temp._x!=goalX && temp._y != goalY){
-            // calc next Field
-            newXPosf = temp._x + move_x + tempCarryX;
-            if( tempCarryX!=0.0f ) {
-                tempCarryX=0.0f;
-            }
-            newXPos = Math.round(newXPosf);
-            if (newXPos == temp._x){
-                tempCarryX = move_x;
-            }
-            newYPosf = temp._y + move_y + tempCarryY;
-            if( tempCarryY!=0.0f ) {
-                tempCarryY=0.0f;
-            }
-            newYPos = Math.round(newYPosf);
-            if (newYPos == temp._y){
-                tempCarryY = move_y;
-            }
-            //check if field is walkable
-            next = board._board[newXPos][newYPos];
-            if(next._isWalkable){
-                temp = next;
-            } else
-                return false;
+    // calculate movement vector to GOAL
+    private float[] getDirection(int goalX, int goalY) {
+        float[] ret = new float[2];
+        int diffX = (_pos._x - goalX) * -1;
+        int diffY = (_pos._y - goalY) * -1;
+        float dist = (float) Math.sqrt((diffX * diffX) + (diffY * diffY));
+        ret[0] = (float) (diffX * (1.0f / dist));
+        ret[1] = (float) (diffY * (1.0f / dist));
+        while( ret[0]>1.0f ) {
+            ret[0] = -1 + (ret[0]-1.0f);
         }
+        while( ret[0]<-1.0f ) {
+            ret[0] = 1 + (ret[0]+1.0f);
+        }
+
+        while ( ret[1]>1.0f ) {
+            ret[1] = -1 + (ret[1]-1.0f);
+        }
+        while ( ret[1]<-1.0f ) {
+            ret[1] = 1 + (ret[1]+1.0f);
+        }
+        return ret;
+    }
+
+    protected boolean isPathClear(int goalX, int goalY, Board board) {
+        float[] dir = getDirection(goalX, goalY);
+        float move_x = dir[0];
+        float move_y = dir[1];
+        int steps = 17;
+        double a2= abs(_pos._x-goalX)^2;
+        double b2= abs(_pos._y-goalY)^2;
+        steps = (int) round(sqrt(a2+b2));
+        if( collDetect(board,move_x,move_y, steps) ) {
+            log("::isPathClear() NOK to:"+goalX +"," + goalY + " with steps:" +steps);
+            return false;
+        }
+        log("::isPathClear() OK to:"+goalX +"," + goalY + " with steps:" +steps);
         return true;
     }
 
     private boolean collDetect(Board board, float intentedX, float intendedY){
+        int steps=17;//_radius+1;
+        return collDetect(board, intentedX, intendedY, steps);
+    }
+    private boolean collDetect(Board board, float intendedX, float intendedY, int steps){
         if( _pos == null )
             return false;
 
         Field nextField = null;
-        int steps=17;//_radius+1;
         for( int i=0; i<steps; ++i) {
-            nextField=calcNextField(board,intentedX, intendedY, i);
+            nextField=calcNextField(board,intendedX, intendedY, i);
             if( !nextField._isWalkable || nextField._tempBlock ) {
-                //log("::collDetect() @"+nextField.toString());
+                log("::collDetect("+intendedX+","+intendedY+") COLL on step:"+i+" on next FIELD@"+nextField.toString());
                 _away_angle = awayAngleFromMe(nextField);
 //                // LOG SURROUNDING FIELDS of collision
 //                for(int fooX=-1; fooX<2; ++fooX) {
@@ -313,24 +313,24 @@ public class Bot {
 //                }
                 return true;
             }
-        }
 
-//        // check surrounding fields
-//        for(int fooX=-1; fooX<2; ++fooX) {
-//            for( int fooY=-1; fooY<2; ++fooY) {
-//                int nbX = _pos._x + fooX*17;
-//                int nbY = _pos._y + fooY*17;
-//                if( nbX>1023 ) nbX=1023;
-//                if( nbX<0 ) nbX=0;
-//                if( nbY>1023 ) nbY=1023;
-//                if( nbY<0 ) nbY=0;
-//                Field field=board._board[nbX][nbY];
-//                if( !field._isWalkable || field._tempBlock ) {
-//                    log("::collDetect() COLL on NB FIELD@" + nextField.toString());
-//                    return true;
+//            // check surrounding fields
+//            for(int fooX=-1; fooX<2; ++fooX) {
+//                for( int fooY=-1; fooY<2; ++fooY) {
+//                    int nbX = nextField._x + fooX*17;
+//                    int nbY = nextField._y + fooY*17;
+//                    if( nbX>1023 ) nbX=1023;
+//                    if( nbX<0 ) nbX=0;
+//                    if( nbY>1023 ) nbY=1023;
+//                    if( nbY<0 ) nbY=0;
+//                    Field field=board._board[nbX][nbY];
+//                    if( !field._isWalkable || field._tempBlock ) {
+//                        log("::collDetect("+intendedX+","+intendedY+") COLL on step:"+i+" on  next NB FIELD@" + field.toString());
+//                        return true;
+//                    }
 //                }
 //            }
-//        }
+        }
 
         if( (_pos._x+steps>1023 && _move_x>0) ||
             (_pos._x-steps<0 && _move_x<0) ||
@@ -345,11 +345,11 @@ public class Bot {
 
     private Field calcNextField(Board board, float intentedX, float intendedY, int step){
         float newXPosf = _pos._x + intentedX*step;
-        int newXPos = Math.round(newXPosf);
+        int newXPos = round(newXPosf);
         if(newXPos > 1023) newXPos = 1023;
         if(newXPos < 0) newXPos = 0;
         float newYPosf = _pos._y + intendedY*step;
-        int newYPos = Math.round(newYPosf);
+        int newYPos = round(newYPosf);
         if(newYPos > 1023) newYPos = 1023;
         if(newYPos < 0) newYPos = 0;
         return board._board[newXPos][newYPos];
