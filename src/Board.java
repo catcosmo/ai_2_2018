@@ -1,5 +1,6 @@
 import lenz.htw.zpifub.Update;
 
+import java.util.HashSet;
 import java.util.List;
 
 import static java.lang.Math.abs;
@@ -10,6 +11,7 @@ public class Board implements Cloneable {
     Client _client = null;
     DrawPanel _draw = new DrawPanel();
     public static int _updateNo = 0;
+    private HashSet<Integer> _ignored_rasters = new HashSet<>(10);
 
     public Board(Client client) {
         _client=client;
@@ -95,7 +97,7 @@ public class Board implements Cloneable {
             return rasterNodes[0];
 
         long botRadius = bot._radius;
-        long best = Long.MAX_LONG;
+        long best = Long.MAX_VALUE;
         int hottestArea = 1;
         long closest = 0;
         int bots_area_id = Board.getRasterID(bot._pos._x, bot._pos._y, Bot.RASTER_SIZE_HOTAREA) ;
@@ -108,6 +110,9 @@ public class Board implements Cloneable {
                 }
             }
             if( bots_area_id==rasterNodes[i].get_numberID() ) {
+                continue;
+            }
+            if( _ignored_rasters.contains( rasterNodes[i].get_numberID()) ) {
                 continue;
             }
             //if brush is slow, check nearer neighbourhood only
@@ -259,7 +264,7 @@ public class Board implements Cloneable {
         long rTemp;
         long gTemp;
         long bTemp;
-        int whiteCarry =0;
+        long whiteCarry =0;
 
         // go through rasterNode pixel by pixel
         for (int y = startY; y < startY + rasterSize; y++) {
@@ -365,5 +370,9 @@ public class Board implements Cloneable {
             }
         });
         thread.start();
+    }
+
+    public void ignoreRasterId(int numberID) {
+        _ignored_rasters.add(numberID);
     }
 }

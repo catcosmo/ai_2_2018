@@ -64,7 +64,7 @@ public class Bot {
         }
 
         if(  didNotMove() ) {
-            _move_x = _move_x*-1;
+            _move_x = _move_x*-0.7f;
             _move_y = _move_y*-1;
             moveToHottestArea(board);
         }
@@ -178,10 +178,31 @@ public class Bot {
         int bots_area_id = Board.getRasterID(_pos._x, _pos._y, Bot.RASTER_SIZE_HOTAREA) ;
         if( _hottest_area!=null && (bots_area_id==_hottest_area.get_numberID() || _did_not_move) ) {
             log("Hottest Area REACHED:" + _hottest_area.get_numberID() + " @" + _hottest_area.get_middleX() + "," +_hottest_area.get_middleY());
+            if( _did_not_move ) {
+                //board.ignoreRasterId(_hottest_area.get_numberID());
+            }
             _hottest_area=null;
+            return false;
         }
         else
         if( _hottest_area!=null ) {
+            if( _use_dijkstra && _my_way.size()>0 ) {
+                RasterNode firstNode = _my_way.get(0);
+                int x = firstNode.get_middleX();
+                int y = firstNode.get_middleY();
+                _my_way.remove(0);
+
+                float[] dir = getDirection(x, y);
+                move_x = dir[0];
+                move_y = dir[1];
+
+                if (move_x != 0.0f || move_y != 0.0f) {
+                    _move_x = move_x;
+                    _move_y = move_y;
+                    return true;
+                }
+
+            }
             return false;
         }
 
@@ -189,7 +210,7 @@ public class Bot {
         //check if fast bot, if so: prioritize white areas
         boolean fastBot = _radius==40;
         //SIZE AND WEIGHT OF HOT AREA RASTER DEFINED HERE!
-        RasterNode[] rasterNodes = board.getRaster(RASTER_SIZE_HOTAREA, 1000, 10000, fastBot, false);
+        RasterNode[] rasterNodes = board.getRaster(RASTER_SIZE_HOTAREA, 9, 50000, fastBot, false);
 
         //get hottest area
         RasterNode rasterNode = board.getHotArea(rasterNodes, this, false, !_use_dijkstra);
@@ -224,7 +245,9 @@ public class Bot {
                 RasterNode firstNode = _my_way.get(1);
                 fieldCenterX = firstNode.get_middleX();
                 fieldCenterY = firstNode.get_middleY();
-                board.saveBoard(_my_way);
+                //board.saveBoard(_my_way);
+                _my_way.remove(0);
+                _my_way.remove(1);
             }
         }
 
