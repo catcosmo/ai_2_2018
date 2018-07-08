@@ -245,6 +245,7 @@ public class Board implements Cloneable {
         int rTemp;
         int gTemp;
         int bTemp;
+        int whiteCarry =0;
 
         // go through rasterNode pixel by pixel
         for (int y = startY; y < startY + rasterSize; y++) {
@@ -264,10 +265,13 @@ public class Board implements Cloneable {
                 }
                 //sum up color values for the other colors
                 else {
-                    //odont add value for fields in own color (more than 125 of own color)
+                    //dont add value for fields in own color (more than 125 of own color)
                     switch (_client.getRemoteClient().getMyPlayerNumber()) {
                         case 0:
-                            r += rTemp*1000*-1;
+                            if(rTemp>125)
+                                r += rTemp*1000*-1;
+                            else
+                                whiteCarry = 255 - rTemp;
                             if(!findWhiteSpace) {
                                 b += bTemp * weightFactor;
                                 g += gTemp * weightFactor;
@@ -277,7 +281,10 @@ public class Board implements Cloneable {
                             }
                             break;
                         case 1:
+                            if(gTemp>125)
                                 g += gTemp*1000*-1;
+                            else
+                                whiteCarry = 255 - gTemp;
                             if(!findWhiteSpace) {
                                 b += bTemp * weightFactor;
                                 r += rTemp * weightFactor;
@@ -287,7 +294,10 @@ public class Board implements Cloneable {
                             }
                             break;
                         case 2:
-                                b += bTemp*1000*-1;
+                            if(bTemp>125)
+                                r += bTemp*1000*-1;
+                            else
+                                whiteCarry = 255 - bTemp;
                             if(!findWhiteSpace) {
                                 r += rTemp * weightFactor;
                                 g += gTemp * weightFactor;
@@ -301,8 +311,9 @@ public class Board implements Cloneable {
             }
         }
         //current weighting: white is more important than colors, black doesnt give negative values
+        // if white is prioritized: weight white higher
         if(findWhiteSpace) {
-            w=w*weightFactor;
+            w=(w*weightFactor)+(whiteCarry*weightFactor);
         }
         s = s*avoidBlackFactor*-1;
         weight = r+g+b+w+s;
