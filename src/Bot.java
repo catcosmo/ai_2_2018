@@ -64,7 +64,7 @@ public class Bot {
         }
 
         if(  didNotMove() ) {
-            _move_x = _move_x*-0.7f;
+            _move_x = _move_x*-0.6f;
             _move_y = _move_y*-1;
             moveToHottestArea(board);
         }
@@ -79,13 +79,12 @@ public class Bot {
             // whatever way we are
             // and paint area
             // paintArea(board);
-
-                // NOT NEEDED ANYMORE?
-//            // safety collision check
-//            if (collDetect(board, _move_x, _move_y)) {
-//                _move_x = _move_x * -1;
-//                _move_y = _move_y * -1;
-//            }
+                // or?
+            // safety collision check
+            if (collDetect(board, _move_x, _move_y)) {
+                _move_x = _move_x * -1;
+                _move_y = _move_y * -1;
+            }
         }
         if( isNaN(_move_x) ) {
             _move_x = -1;
@@ -207,7 +206,7 @@ public class Bot {
 
         //get raster
         //check if fast bot, if so: prioritize white areas
-        boolean fastBot = _radius==40;
+        boolean fastBot = (_radius==40);
         //SIZE AND WEIGHT OF HOT AREA RASTER DEFINED HERE!
         RasterNode[] rasterNodes = board.getRaster(RASTER_SIZE_HOTAREA, 9, 50000, fastBot, false);
 
@@ -426,7 +425,7 @@ public class Bot {
          }
         //walk 2 * your own radius
         //turn 90° right
-         else if(_startAreaTurnY != 0 && _startAreaTurnX != 0 && distance > _radius*3){
+         else if(_startAreaTurnY != 0 && _startAreaTurnX != 0 && distance > _radius*2){
             float[] moveVector = calcNewDirVector(angle);
             //turn 90° right
             move_x = moveVector[0];
