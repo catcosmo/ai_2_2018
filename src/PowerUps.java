@@ -53,7 +53,7 @@ public class PowerUps {
                 if( diff < best_diff ) {
                     boolean clearPath = bot.isPathClear(next._x, next._y, _board);
                     if (clearPath) {
-                        log("findNearest() FOUND bot@" + bot._pos._x + "," + bot._pos._y + " ->" + next._x + "," + next._y);
+                        // log("findNearest() FOUND bot@" + bot._pos._x + "," + bot._pos._y + " ->" + next._x + "," + next._y);
                         best = next;
                         best_diff = diff;
                     }

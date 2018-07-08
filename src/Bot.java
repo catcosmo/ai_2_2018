@@ -71,17 +71,16 @@ public class Bot {
         else
             {
             // give it a direction
-            //if( !moveToNearestPU(powerUps, board)) {
-                //moveToHottestArea(board);
-            //}
-
-            paintAreaNew(board);
+            if( !moveToNearestPU(powerUps, board)) {
+                moveToHottestArea(board);
+            }
 
             // turn on next collision
             // whatever way we are
             // and paint area
+            // paintArea(board);
 
-            // NOT NEEDED ANYMORE?
+                // NOT NEEDED ANYMORE?
 //            // safety collision check
 //            if (collDetect(board, _move_x, _move_y)) {
 //                _move_x = _move_x * -1;
@@ -186,7 +185,7 @@ public class Bot {
         }
         else
         if( _hottest_area!=null ) {
-            if( _use_dijkstra && _my_way.size()>0 ) {
+            if( _use_dijkstra && _my_way!=null && _my_way.size()>0 ) {
                 RasterNode firstNode = _my_way.get(0);
                 int x = firstNode.get_middleX();
                 int y = firstNode.get_middleY();
@@ -395,61 +394,7 @@ public class Bot {
     }
 
 
-    private boolean paintArea(Board board) {
-        if( _pos == null )
-            return false;
-
-        float move_x = 0.0f;
-        float move_y = 0.0f;
-        double angle = 90;
-
-        if( collDetect(board,_move_x,_move_y) ) {
-            float[] moveVector = calcNewDirVector(angle);
-            move_x = _move_x + (moveVector[0]) % 1;
-            move_y = _move_x + (moveVector[1]) % 1;
-            //log("::paintArea() -> COLL Turn!");
-            if( collDetect(board,move_x,move_y)) {
-                //log("::paintArea() -> COLL Turn on NEW direction -> turn away");
-                moveVector = calcNewDirVector(_away_angle);
-                move_x = _move_x + (moveVector[0]) % 1;
-                move_y = _move_x + (moveVector[1]) % 1;
-            }
-            _startAreaTurnX = _pos._x;
-            _startAreaTurnX = _pos._y;
-        }
-        else
-        if( (_startAreaTurnY != 0.0f || _startAreaTurnX != 0.0f ) &&
-            abs(_startAreaTurnX-_pos._x) +abs(_startAreaTurnY-_pos._y)>2*_radius ) {
-            //log("::paintArea() -> 2x bot._radius drawn - Turn!");
-            float[] moveVector = calcNewDirVector(angle);
-            move_x = _move_x + (moveVector[0]) % 1;
-            move_y = _move_x + (moveVector[1]) % 1;
-            if( collDetect(board,move_x,move_y)) {
-                //log("::paintArea() -> 2x bot._radius drawn - Turn! Coll on new dir! -> turnaround");
-                angle +=180;
-                moveVector = calcNewDirVector(angle);
-                move_x = (moveVector[0]) % 1;
-                move_y = (moveVector[1]) % 1;
-            }
-            _startAreaTurnX = 0;
-            _startAreaTurnY = 0;
-        }
-
-        // startest? -> merke startcoord als member und laufe rechts
-        // läuft schon -> wo bin ich? weit genug nach rechts -> runter sonst weiter
-        //
-
-
-        if( move_x!=0.0f || move_y!=0.0f) {
-            _move_x=move_x;
-            _move_y=move_y;
-            return true;
-        }
-        return false;
-    }
-
-
-    private boolean paintAreaNew(Board board){
+    private boolean paintArea(Board board){
         if( _pos == null )
             return false;
 
@@ -477,7 +422,7 @@ public class Bot {
             move_y = moveVector[1];
             _startAreaTurnX = _pos._x;
             _startAreaTurnY = _pos._y;
-
+            log("paintArea() COLL - first turn");
          }
         //walk 2 * your own radius
         //turn 90° right
@@ -490,7 +435,7 @@ public class Bot {
             _startAreaTurnY = 0;
             //repeat with 90° left
             _turnsRight = !_turnsRight;
-            System.out.println("turn!");
+            log("paintArea() 2x radius drawn - turn");
         }
 
 
