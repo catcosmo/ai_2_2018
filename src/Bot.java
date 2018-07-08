@@ -34,7 +34,8 @@ public class Bot {
     }
 
     private void log(String msg) {
-        System.out.println(Board._updateNo+": Bot["+_botNr+"@"+_pos._x+","+_pos._y+"|"+_move_x+","+_move_y+"]"+msg);
+        int rId = Board.getRasterID(_pos._x,_pos._y, RASTER_SIZE_HOTAREA);
+        System.out.println(Board._updateNo+": Bot["+_botNr+"@<"+rId+">"+_pos._x+","+_pos._y+"|"+_move_x+","+_move_y+"]"+msg);
     }
 
     public void updatePos(Update update, Board board, Client client) {
@@ -64,13 +65,14 @@ public class Bot {
         if(  didNotMove() ) {
             _move_x = _move_x*-1;
             _move_y = _move_y*-1;
+            moveToHottestArea(board);
         }
         else
             {
             // give it a direction
-            if( !moveToNearestPU(powerUps, board) ) {
-            //    moveToHottestArea(board);
-            }
+//            if( !moveToNearestPU(powerUps, board) ) {
+                moveToHottestArea(board);
+//            }
 
             // turn on next collision
             // whatever way we are
@@ -171,24 +173,32 @@ public class Bot {
         float move_x = 0.0f;
         float move_y = 0.0f;
 
+        int bots_area_id = Board.getRasterID(_pos._x, _pos._y, Bot.RASTER_SIZE_HOTAREA) ;
+        if( _hottest_area!=null && (bots_area_id==_hottest_area.get_numberID() || _did_not_move) ) {
+            log("Hottest Area REACHED:" + _hottest_area.get_numberID() + " @" + _hottest_area.get_middleX() + "," +_hottest_area.get_middleY());
+            _hottest_area=null;
+        }
+        else
+        if( _hottest_area!=null ) {
+            return false;
+        }
+
         //get raster
         //check if fast bot, if so: prioritize white areas
         boolean fastBot = _radius==40;
         //SIZE AND WEIGHT OF HOT AREA RASTER DEFINED HERE!
-        RasterNode[] rasterNodes = board.getRaster(RASTER_SIZE_HOTAREA, 3, 0, fastBot, false);
+        RasterNode[] rasterNodes = board.getRaster(RASTER_SIZE_HOTAREA, 1000, 10000, fastBot, false);
 
         //get hottest area
-        RasterNode rasterNode = board.getHotArea(rasterNodes, this, true);
-        if( _hottest_area!=null && _hottest_area.get_numberID()==rasterNode.get_numberID() ) {
-
-        } else {
-            log("Hottest Area is:" + rasterNode.get_numberID());
-        }
-        _hottest_area = rasterNode;
-
+        RasterNode rasterNode = board.getHotArea(rasterNodes, this, false, !_use_dijkstra);
         //get x,y coordinates of center = goal
         int fieldCenterX = rasterNode.get_startX()+rasterNode.get_size()/2;
         int fieldCenterY = rasterNode.get_startY()+rasterNode.get_size()/2;
+        if( _hottest_area!=null && _hottest_area.get_numberID()==rasterNode.get_numberID() ) {
+
+        } else {
+            log("Hottest Area is:" + rasterNode.get_numberID() + " @" + fieldCenterX + "," +fieldCenterY);
+        }
 
         // DIRECT MOVE to target
         if( !_use_dijkstra ) {
@@ -208,11 +218,11 @@ public class Bot {
             if (_my_way.size() == 0) {
                 log(" djisktra empty!");
             } else {
+                log(" djisktra OK! to:"+ fieldCenterX+","+ fieldCenterY+" waypts:" + _my_way.size());
                 RasterNode firstNode = _my_way.get(0);
                 fieldCenterX = firstNode.get_startX() + firstNode.get_size() / 2;
                 fieldCenterY = firstNode.get_startY() + firstNode.get_size() / 2;
-                //log(" djisktra OK! wp:" + _my_way.size() + " 1st:" + fieldCenterX + "," + fieldCenterY );
-                //board.saveBoard(_my_way);
+                board.saveBoard(_my_way);
             }
         }
 
@@ -220,13 +230,14 @@ public class Bot {
             return false;
         }
 
-        float[] dir = getDirection(fieldCenterX, fieldCenterX);
+        float[] dir = getDirection(fieldCenterX, fieldCenterY);
         move_x = dir[0];
         move_y = dir[1];
 
         if (move_x != 0.0f || move_y != 0.0f) {
             _move_x = move_x;
             _move_y = move_y;
+            _hottest_area = rasterNode;
             return true;
         }
 
@@ -268,7 +279,7 @@ public class Bot {
         b2 *= b2;
         steps = round(sqrt(a2+b2));
         if( collDetect(board,move_x,move_y, steps) ) {
-            log("::isPathClear() NOK to:"+goalX +"," + goalY + " with steps:" +steps);
+            //log("::isPathClear() NOK to:"+goalX +"," + goalY + " with steps:" +steps);
             return false;
         }
         //log("::isPathClear() OK to:"+goalX +"," + goalY + " with steps:" +steps);
@@ -287,7 +298,7 @@ public class Bot {
         for( int i=0; i<steps; ++i) {
             nextField=calcNextField(board,intendedX, intendedY, i);
             if( !nextField._isWalkable || nextField._tempBlock ) {
-                log("::collDetect("+intendedX+","+intendedY+") COLL on step:"+i+" on next FIELD@"+nextField.toString());
+                // log("::collDetect("+intendedX+","+intendedY+") COLL on step:"+i+" on next FIELD@"+nextField.toString());
                 _away_angle = awayAngleFromMe(nextField);
 //                // LOG SURROUNDING FIELDS of collision
 //                for(int fooX=-1; fooX<2; ++fooX) {

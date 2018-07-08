@@ -92,6 +92,14 @@ public class RasterNode {
         this._size = _size;
     }
 
+    public int get_middleX() {
+        return this._startX + (this._size/2);
+    }
+
+    public int get_middleY() {
+        return this._startY + (this._size/2);
+    }
+
     public int get_numberID() {
         return _numberID;
     }

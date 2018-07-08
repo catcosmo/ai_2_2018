@@ -90,7 +90,7 @@ public class Board implements Cloneable {
 
 
     //calculate hot area for bot
-    public RasterNode getHotArea(RasterNode[] rasterNodes, Bot bot, boolean includeNeighbours){
+    public RasterNode getHotArea(RasterNode[] rasterNodes, Bot bot, boolean includeNeighbours, boolean onlyClearPath){
         if( bot._pos==null )
             return rasterNodes[0];
 
@@ -98,8 +98,18 @@ public class Board implements Cloneable {
         long best = 0;
         int hottestArea = 1;
         long closest = 0;
+        int bots_area_id = Board.getRasterID(bot._pos._x, bot._pos._y, Bot.RASTER_SIZE_HOTAREA) ;
 
         for (int i = 0; i < rasterNodes.length; i++) {
+            if( onlyClearPath ) {
+                boolean clearPath = bot.isPathClear(rasterNodes[i].get_middleX(), rasterNodes[i].get_middleY(), this);
+                if (!clearPath) {
+                    continue;
+                }
+            }
+            if( bots_area_id==rasterNodes[i].get_numberID() ) {
+                continue;
+            }
             //if brush is slow, check nearer neighbourhood only
             //spraycan gets the whole field to play in
             //small brush
@@ -152,7 +162,7 @@ public class Board implements Cloneable {
     }
 
     //return raster field ID of current position
-    public int getRasterID(int x, int y, int rasterSize){
+    public static int getRasterID(int x, int y, int rasterSize){
         int rasterID;
         int xID;
         int yID;
