@@ -2,6 +2,7 @@ import lenz.htw.zpifub.Update;
 
 import java.util.List;
 
+import static java.lang.Math.abs;
 import static lenz.htw.zpifub.PowerupType.SLOW;
 
 public class Board implements Cloneable {
@@ -93,24 +94,24 @@ public class Board implements Cloneable {
         if( bot._pos==null )
             return rasterNodes[0];
 
-        int botRadius = bot._radius;
-        int best = 0;
+        long botRadius = bot._radius;
+        long best = 0;
         int hottestArea = 1;
-        int closest = 0;
+        long closest = 0;
 
         for (int i = 0; i < rasterNodes.length; i++) {
             //if brush is slow, check nearer neighbourhood only
             //spraycan gets the whole field to play in
             //small brush
             if(botRadius == 15 &&
-                    ((bot._pos._x-rasterNodes[i].get_startX())>512
-                        || (bot._pos._y-rasterNodes[i].get_startY())>512)){
+                    (abs(bot._pos._x-rasterNodes[i].get_startX())>512
+                        || abs(bot._pos._y-rasterNodes[i].get_startY())>512)){
                 continue;
             }
             //wide brush
             if(botRadius == 30 &&
-                    ((bot._pos._x-rasterNodes[i].get_startX())>400
-                            || (bot._pos._y-rasterNodes[i].get_startY())>400)){
+                    (abs(bot._pos._x-rasterNodes[i].get_startX())>400
+                            || abs(bot._pos._y-rasterNodes[i].get_startY())>400)){
                 continue;
             }
             if(!includeNeighbours) {
@@ -179,8 +180,12 @@ public class Board implements Cloneable {
         RasterNode[] rasterNodes = new RasterNode[(_board.length/rasterSize)*(_board.length/rasterSize)];
         for (int y = 0; y < 1024; y+=rasterSize) {
             for (int x = 0; x < 1024; x+=rasterSize) {
-                int weight = 0;
-                weight = calcRasterWeight(x, y, rasterSize, weightFactor, avoidBlackFactor, false);
+                long weight = 0;
+                if( walkable ) {
+                    weight = calcWalkableRasterWeight(x, y, rasterSize);
+                } else {
+                    weight = calcRasterWeight(x, y, rasterSize, weightFactor, avoidBlackFactor, findWhiteSpaceg);
+                }
                 //System.out.println("Weight for Raster:" + counter + " is:" + weight);
                 RasterNode rasterNode = new RasterNode(x, y, rasterSize, counter, weight);
                 rasterNodes[counter] = rasterNode;
@@ -234,17 +239,17 @@ public class Board implements Cloneable {
     //avoidBlackFactor: factor with which black pixels are multiplied:
     //for hotAreaDtection 0, for pathfinding (smaller raster) e.g. 1000
     //bool findWhiteSpace to prioritize white pixels
-    private int calcRasterWeight(int startX, int startY, int rasterSize, int weightFactor, int avoidBlackFactor, boolean findWhiteSpace) {
-        int weight = 0;
-        int rgb;
-        int r = 0; //r, g, b total sum of all fields - the higher, the better the area for that color
-        int g = 0;
-        int b = 0;
-        int s = 0; // how many black blocks, numerical
-        int w = 0; // how many white blocks, numerical
-        int rTemp;
-        int gTemp;
-        int bTemp;
+    private long calcRasterWeight(int startX, int startY, int rasterSize, int weightFactor, int avoidBlackFactor, boolean findWhiteSpace) {
+        long weight = 0;
+        long rgb;
+        long r = 0; //r, g, b total sum of all fields - the higher, the better the area for that color
+        long g = 0;
+        long b = 0;
+        long s = 0; // how many black blocks, numerical
+        long w = 0; // how many white blocks, numerical
+        long rTemp;
+        long gTemp;
+        long bTemp;
 
         // go through rasterNode pixel by pixel
         for (int y = startY; y < startY + rasterSize; y++) {
