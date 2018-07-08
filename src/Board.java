@@ -288,7 +288,7 @@ public class Board implements Cloneable {
                     switch (_client.getRemoteClient().getMyPlayerNumber()) {
                         case 0:
                             if(rTemp>125)
-                                r += rTemp*5000;
+                                r += rTemp*2000;
                             else
                                 whiteCarry = 255 - rTemp;
                             if(!findWhiteSpace) {
@@ -301,7 +301,7 @@ public class Board implements Cloneable {
                             break;
                         case 1:
                             if(gTemp>125)
-                                g += gTemp*5000;
+                                g += gTemp*2000;
                             else
                                 whiteCarry = 255 - gTemp;
                             if(!findWhiteSpace) {
@@ -314,7 +314,7 @@ public class Board implements Cloneable {
                             break;
                         case 2:
                             if(bTemp>125)
-                                r += bTemp*5000;
+                                r += bTemp*2000;
                             else
                                 whiteCarry = 255 - bTemp;
                             if(!findWhiteSpace) {
