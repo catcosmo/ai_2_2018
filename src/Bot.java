@@ -7,7 +7,7 @@ import static java.lang.Math.abs;
 import static java.lang.Math.sqrt;
 
 public class Bot {
-    private static final boolean _use_dijkstra = true;
+    private static final boolean _use_dijkstra = false;
     public static final int RASTER_SIZE_HOTAREA=128;
     public static final int RASTER_SIZE_DIJKSTRA=32;
 
@@ -68,7 +68,7 @@ public class Bot {
             {
             // give it a direction
 //            if( !moveToNearestPU(powerUps, board) ) {
-                moveToHottestArea(board);
+                //moveToHottestArea(board);
 //            }
 
             // turn on next collision
@@ -407,6 +407,25 @@ public class Bot {
             return true;
         }
         return false;
+    }
+
+
+    private boolean paintAreaNew(Board board){
+        if( _pos == null )
+            return false;
+
+        float move_x = 0.0f;
+        float move_y = 0.0f;
+        //walk in one direction
+        //until you hit obstacle
+        if(collDetect(board, 0, 0)){
+
+        }
+        //turn 90° right
+        //walk 2 * your own radius
+        //turn 90° right
+        //repeat with 90° left
+        return true;
     }
 
     //calculate new x/y coordinates for movement direction, input angle in which to change
